@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Y2K Base Styles */
+@layer base {
+  body {
+    @apply bg-gradient-to-br from-neon-green to-neon-purple;
+    @apply font-grotesk;
+    @apply text-chrome-silver;
+    position: relative;
+    min-height: 100vh;
+  }
+  
+  /* Grain texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.15;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: 1;
+  }
+}
+
+@layer components {
+  /* Chrome text effect */
+  .text-chrome {
+    background: linear-gradient(180deg, #ffffff 0%, #c0c0c0 50%, #808080 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Glossy black container */
+  .glossy-black {
+    @apply bg-glossy-black/90 backdrop-blur-xl;
+    @apply border border-white/10;
+    @apply shadow-2xl;
+  }
+}

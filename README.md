@@ -1,0 +1,1 @@
+Brat is a cross-media recommendation system that provides personalized recommendations across movies, books, and music using explainable AI. The system builds user taste vectors through AI-powered content attribute extraction and provides real-time visualization of user preferences with cross-media discovery capabilities.
