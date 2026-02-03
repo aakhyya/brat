@@ -5,7 +5,7 @@
 /* Y2K Base Styles */
 @layer base {
   body {
-    @apply bg-gradient-to-br from-neon-green to-neon-purple;
+    @apply bg-gradient-to-br from-black via-neon-green to-black;
     @apply font-grotesk;
     @apply text-chrome-silver;
     position: relative;

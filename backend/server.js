@@ -6,10 +6,11 @@ const PORT=process.env.PORT || 3000;
 
 // Imports
 const connectDB = require('./config/database');
+const authRoutes=require('./routes/authRoutes');
+const { apiLimiter } = require('./middlewares/rateLimiter');
 
 // Connect to database
 connectDB();
-
 
 //Middlewares
 app.use(cors());
@@ -20,7 +21,8 @@ app.use(express.urlencoded({extended:false}));
 app.get("/", (req, res) => {
   res.json({ message: "Hello from brat" });
 });
-
+app.use('/api/',apiLimiter);
+app.use('/api/auth', authRoutes);
 
 //404 Handler
 app.use((req,res)=>{
@@ -36,3 +38,5 @@ app.listen(PORT, ()=>{
 });
 
 
+//Users:
+//1. Test 1 : test1@gmail.com 1234567
