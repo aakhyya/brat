@@ -63,7 +63,7 @@ function Input({label,type="text",error,icon,...props}){
                     tracking-wide
                     animate-pulse
                 ">
-                   ⚠ {error}
+                   🚨  {error} ❗
                 </p>
             )}
         </div>

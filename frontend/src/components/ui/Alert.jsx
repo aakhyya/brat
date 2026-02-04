@@ -41,7 +41,7 @@ function Alert({type="info",message,onClose}){
                         transition-transform
                         hover:scale-110
                     ">
-                        x
+                        ✘
                     </button>
                 )}
             </div>

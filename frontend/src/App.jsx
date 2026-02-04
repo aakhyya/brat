@@ -1,27 +1,33 @@
-import { useEffect } from 'react';
-import api from './services/api';
+import {Routes, Route, Navigate} from "react-router-dom";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Dashboard from "./pages/Dashboard";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 function App() {
-
-  useEffect(() => {
-    api.get('/')
-      .then(res => console.log('API Response:', res.data)) //JSON Response from backend
-      .catch(err => console.error('API Error:', err));
-  }, []);
-
   return (
-    <div className="min-h-screen flex items-center justify-center relative z-10">
-      <div className="glossy-black p-12 rounded-lg">
-        <h1 className="text-6xl font-black uppercase tracking-tight text-chrome mb-4">
-          Brat
-        </h1>
+     <Routes>
+      <Route
+        path="/"
+        element={<Navigate to="/login" replace />}
+      />
 
-        <p className="text-neon-green text-xl font-bold uppercase tracking-wide">
-          Y2K Aesthetic Loaded ✨
-        </p> 
-      </div>
-    </div>
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+
+      {/* Protected Route */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
   );
 }
 
 export default App;
+
+//“interesting taste. let’s verify.”
