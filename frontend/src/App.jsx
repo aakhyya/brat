@@ -15,9 +15,10 @@ function App() {
         <h1 className="text-6xl font-black uppercase tracking-tight text-chrome mb-4">
           Brat
         </h1>
+
         <p className="text-neon-green text-xl font-bold uppercase tracking-wide">
           Y2K Aesthetic Loaded ✨
-        </p>
+        </p> 
       </div>
     </div>
   );
