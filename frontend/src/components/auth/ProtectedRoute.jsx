@@ -17,7 +17,7 @@ function ProtectedRoute({children}){
                                 animate-spin
                                 mx-auto
                                 mb-4'/>
-                    <p className='text-chrome-silver text-xl font-bo uppercase tracking-wider'>
+                    <p className='text-chrome-silver text-xl font-bold uppercase tracking-wider'>
                         Loading...
                     </p>
                 </div>

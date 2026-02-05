@@ -8,6 +8,7 @@ const PORT=process.env.PORT || 3000;
 const connectDB = require('./config/database');
 const authRoutes=require('./routes/authRoutes');
 const { apiLimiter } = require('./middlewares/rateLimiter');
+const contentRoutes = require("./routes/contentRoutes");
 
 // Connect to database
 connectDB();
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
 });
 app.use('/api/',apiLimiter);
 app.use('/api/auth', authRoutes);
+app.use("/api/content", contentRoutes);
 
 //404 Handler
 app.use((req,res)=>{

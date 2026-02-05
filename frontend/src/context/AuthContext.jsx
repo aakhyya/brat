@@ -64,9 +64,7 @@ export function AuthProvider({children}){
             const response= await api.post("/api/auth/signup",{
                 email,
                 password,
-                profile: {
-                    displayName,
-                },
+                displayName,
             });
             const {token,user}=response.data.data;
             localStorage.setItem("token",token);
