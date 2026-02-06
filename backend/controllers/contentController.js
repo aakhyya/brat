@@ -1,7 +1,11 @@
 const mongoose=require("mongoose");
 const Content=require("../models/content");
 const Interaction=require("../models/interaction");
+const tmdbService = require('../services/tmdbService');
+const itunesService = require('../services/itunesService');
+const googleBooksService = require('../services/googleBooksService');
 
+//Manual
 async function createContent(req,res){
     try{
         const {type,title,description,releaseDate,creators,metadata,images,externalIds} = req.body;
@@ -95,105 +99,341 @@ async function getAllContent(req,res) {
 }
 
 async function getContentById(req,res) {
-    const {id}=req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({
-            success: false,
-            message: "Invalid content ID format",
+    try{
+        const {id}=req.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid content ID format",
+            });
+        }
+
+        const content=await Content.findById(id);
+        if(!content){
+            return res.status(404).json({
+                success: false,
+                message: "Content not found",
+            });
+        }
+
+        res.json({
+            success: true,
+            data: { content },
         });
     }
-
-    const content=await Content.findById(id);
-    if(!content){
-        return res.status(404).json({
+    catch(err){
+        res.status(500).json({
             success: false,
-            message: "Content not found",
+            message: "Server error while getting content by id",
         });
     }
-
-    res.json({
-        success: true,
-        data: { content },
-    });
 }
 
 async function updateContent(req,res) {
-    const {id}=req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({
-            success: false,
-            message: "Invalid content ID format",
+    try{
+        const {id}=req.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid content ID format",
+            });
+        }
+
+        const updates={...req.body};
+        //Can't update the following
+        delete updates.type;
+        delete updates._id;
+        delete updates.createdAt;
+
+        const content = await Content.findByIdAndUpdate(
+            id, //id
+            updates, //change updates
+            { new: true, //returns new updates
+            runValidators: true } //enforces schema rules on updates
+        );
+        if (!content) {
+            return res.status(404).json({
+                success: false,
+                message: "Content not found",
+            });
+        }
+
+        res.json({
+            success: true,
+            message: "Content updated successfully",
+            data: { content },
         });
     }
-
-    const updates={...req.body};
-    //Can't update the following
-    delete updates.type;
-    delete updates._id;
-    delete updates.createdAt;
-
-    const content = await Content.findByIdAndUpdate(
-        id, //id
-        updates, //change updates
-        { new: true, //returns new updates
-        runValidators: true } //enforces schema rules on updates
-    );
-    if (!content) {
-        return res.status(404).json({
+    catch(err){
+        res.status(500).json({
             success: false,
-            message: "Content not found",
+            message: "Server error while updating content",
         });
     }
-
-    res.json({
-        success: true,
-        message: "Content updated successfully",
-        data: { content },
-    });
 }
 
 async function deleteContent(req,res){
-    const {id}=req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({
-            success: false,
-            message: "Invalid content ID format",
+    try{
+        const {id}=req.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid content ID format",
+            });
+        }
+
+        const content = await Content.findByIdAndDelete(id);
+        if (!content) {
+            return res.status(404).json({
+                success: false,
+                message: "Content not found",
+            });
+        }
+
+        await Interaction.deleteMany({ contentId: id }); //delete all interactions related to the content
+        res.json({
+            success: true,
+            message: "Content and related interactions deleted",
         });
     }
-
-    const content = await Content.findByIdAndDelete(id);
-    if (!content) {
-        return res.status(404).json({
+    catch(err){
+        res.status(500).json({
             success: false,
-            message: "Content not found",
+            message: "Server error while deleting content",
         });
     }
-
-    await Interaction.deleteMany({ contentId: id }); //delete all interactions related to the content
-    res.json({
-        success: true,
-        message: "Content and related interactions deleted",
-    });
 }
 
 async function searchContent(req,res){ //combine text score + popularity
-    const {q} = req.query; //Pulling query from URL
-    if(!q){
-        return res.status(400).json({
-            success: false,
-            message: "Search query is required",
+    try{
+        const {q} = req.query; //Pulling query from URL
+        if (!q || q.trim().length < 2) {
+            return res.status(400).json({
+                message: "Search query must be at least 2 characters"
+            });
+        }
+
+        const results=await Content.find(
+            { $text: { $search: q } }, //Search indexed text fields for the words in q
+            { score: { $meta: "textScore" } } //tells mongo to calculate, return a relevance score for each document
+        ).sort({ score: { $meta: "textScore" } }); //highest score on top
+
+        res.json({
+            success: true, 
+            data: { results }
         });
     }
-
-    const results=await Content.find(
-        { $text: { $search: q } }, //Search indexed text fields for the words in q
-        { score: { $meta: "textScore" } } //tells mongo to calculate, return a relevance score for each document
-    ).sort({ score: { $meta: "textScore" } }); //highest score on top
-
-    res.json({
-        success: true, 
-        data: { results }
-    });
+    catch(err){
+        res.status(500).json({
+            success: false,
+            message: "Server error while searching content",
+        });
+    }
 }
 
-module.exports={createContent,getAllContent,getContentById,updateContent,deleteContent,searchContent};
+//TMDB: Movies
+async function searchMovies(req,res){
+    try{
+        const {query}=req.query;
+        if (!query || query.trim().length < 2) {
+            return res.status(400).json({
+                success: false,
+                message: 'Search query is required'
+            });
+        }
+
+        const results=await tmdbService.searchMovies(query);
+        return res.json({
+            success: true,
+            data: {
+                results: results.map(movie => ({
+                externalId: movie.tmdbId,
+                title: movie.title,
+                year: movie.releaseDate?.split('-')[0] || null,
+                thumbnail: movie.posterPath
+                    ? `https://image.tmdb.org/t/p/w200${movie.posterPath}`
+                    : null
+                }))
+            }
+        });
+    }
+    catch(err){
+        console.error('Movie search error:', err.message);
+        //503 communicates dependency failure, while 500 indicates internal server failure.
+        res.status(503).json({
+            success: false,
+            message: 'Movie search service unavailable'
+        });
+    }
+}
+
+async function enrichMovie(req,res) {
+    try{
+        const {tmdbId}=req.params;
+
+        const existing=await Content.findOne({
+            'externalIds.tmdb':tmdbId
+        });
+        if (existing) {
+            return res.json({
+                success: true,
+                data: { content: existing }
+            });
+        }
+
+        const movie=await tmdbService.getMovieDetails(tmdbId);
+        const content=await Content.create(movie);
+
+        return res.status(201).json({
+            success: true,
+            data: { content }
+        });
+    }
+    catch(err){
+        console.error('Movie enrichment error:', err.message);
+        res.status(503).json({
+            success: false,
+            message: 'Movie enrichment failed'
+        });
+    }
+}
+
+//iTunes: Songs
+async function searchSongs (req,res) {
+    try{
+        const { query } = req.query;
+
+        if (!query || query.trim().length < 2) {
+            return res.status(400).json({
+                success: false,
+                message: 'Search query is required'
+            });
+        }
+
+        const results = await itunesService.searchSongs(query);
+
+        return res.json({
+            success: true,
+            data: {
+                results: results.map(song => ({
+                externalId: song.itunesId,
+                title: song.title,
+                subtitle: song.artist,
+                thumbnail: song.artwork
+                }))
+            }
+        });
+    }
+    catch(err){
+        console.error('Song search error:', err.message);
+        res.status(503).json({
+            success: false,
+            message: 'Song search service unavailable'
+        });
+    }
+}
+
+async function enrichSong(req,res){
+    try {
+        const { itunesId } = req.params;
+
+        const existing = await Content.findOne({
+            'externalIds.itunes': itunesId
+        });
+
+        if (existing) {
+            return res.json({
+                success: true,
+                data: { content: existing }
+            });
+        }
+
+        const song = await itunesService.getSongDetails(itunesId);
+        const content = await Content.create(song);
+
+        return res.status(201).json({
+            success: true,
+            data: { content }
+        });
+    } 
+    catch (err) {
+        console.error('Song enrichment error:', err.message);
+        res.status(503).json({
+            success: false,
+            message: 'Song enrichment failed'
+        });
+    }
+}
+
+//GoogleBooks: Books
+async function searchBooks(req,res){
+    try{
+        const { query } = req.query;
+
+        if (!query || query.trim().length < 2) {
+            return res.status(400).json({
+                success: false,
+                message: 'Search query is required'
+            });
+        }
+
+        const results = await googleBooksService.searchBooks(query);
+
+        return res.json({
+            success: true,
+            data: {
+                results: results.map(book => ({
+                    externalId: book.googleBooksId,
+                    title: book.title,
+                    subtitle: book.authors?.join(', ') || null,
+                    thumbnail: book.thumbnail
+                }))
+            }
+        });
+    }
+    catch(err){
+        console.error('Book search error:', err.message);
+        res.status(503).json({
+            success: false,
+            message: 'Book search service unavailable'
+        });
+    }
+}
+
+async function enrichBook(req,res){
+    try{
+        const { googleBooksId } = req.params;
+
+        const existing = await Content.findOne({
+            'externalIds.googleBooks': googleBooksId
+        });
+
+        if (existing) {
+            return res.json({
+                success: true,
+                data: { content: existing }
+            });
+        }
+
+        const book = await googleBooksService.getBookDetails(googleBooksId);
+        const content = await Content.create(book);
+
+        return res.status(201).json({
+            success: true,
+            data: { content }
+        });
+    }
+    catch(err){
+        console.error('Book enrichment error:', err.message);
+        res.status(503).json({
+            success: false,
+            message: 'Book enrichment failed'
+        });
+    }
+}
+
+
+module.exports={
+    createContent,getAllContent,getContentById,updateContent,deleteContent,searchContent,
+    searchMovies,enrichMovie,searchSongs,enrichSong,searchBooks,enrichBook
+};

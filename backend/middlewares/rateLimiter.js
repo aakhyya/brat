@@ -1,4 +1,5 @@
 const rateLimit = require('express-rate-limit');
+//Rate limits are handled through caching, retries, and request throttling.
 
 // General API rate limiter: general control
 exports.apiLimiter = rateLimit({
