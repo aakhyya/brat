@@ -1,5 +1,6 @@
 import useAuth from "../hooks/useAuth";
 import Button from "../components/ui/Button";
+import { Link } from "react-router-dom";
 
 function Dashboard() {
     const { user, logout } = useAuth();
@@ -34,7 +35,7 @@ function Dashboard() {
                                 text-center
                             "
                 >
-                   ♱ Brat ♱
+                    ♱ Brat ♱
                 </h1>
                 {/* Welcome Card */}
                 <div
@@ -48,23 +49,8 @@ function Dashboard() {
                 >
                     {/* User Info Header */}
                     <div className="flex items-center justify-between mb-6">
-                        <div>
-                            <h2
-                                className="
-                  text-3xl
-                  font-black
-                  text-neon-green
-                  mb-2
-                "
-                            >
-                                Welcome {user?.profile?.displayName} ᝰ🚬
-                            </h2>
-                            <p className="text-chrome-silver text-lg">
-                                prove you're not tasteless
-                            </p>
-                        </div>
-
                         {/* Avatar */}
+                        <div className="flex justify-between">
                         <div
                             className="
                 w-20
@@ -82,6 +68,34 @@ function Dashboard() {
                         >
                             ☠︎︎
                         </div>
+                        <div className="pl-5">
+                            <h2
+                                className="
+                  text-3xl
+                  font-black
+                  text-neon-green
+                  mb-2
+                  
+                "
+                            >
+                                Welcome {user?.profile?.displayName} ᝰ🚬
+                            </h2>
+                            <p className="text-chrome-silver text-lg">
+                                prove you're not tasteless
+                            </p>
+                        </div>
+                    </div>
+                        
+                    {/* Primary Action: Search Content */}
+                    <div className="mb-8 flex justify-center">
+                        <Link to="/search">
+                            <Button variant="secondary">
+                                Search Content
+                            </Button>
+                        </Link>
+                    </div>
+
+                        
                     </div>
 
                     {/* Info Grid */}
@@ -128,6 +142,7 @@ function Dashboard() {
                             </p>
                         </div>
                     </div>
+
 
                     {/* Logout Button */}
                     <div className="max-w-xs mx-auto">

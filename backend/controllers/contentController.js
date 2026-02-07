@@ -234,15 +234,15 @@ async function searchContent(req,res){ //combine text score + popularity
 //TMDB: Movies
 async function searchMovies(req,res){
     try{
-        const {query}=req.query;
-        if (!query || query.trim().length < 2) {
+        const {q}=req.query;
+        if (!q || q.trim().length < 2) {
             return res.status(400).json({
                 success: false,
                 message: 'Search query is required'
             });
         }
 
-        const results=await tmdbService.searchMovies(query);
+        const results=await tmdbService.searchMovies(q);
         return res.json({
             success: true,
             data: {
@@ -251,7 +251,7 @@ async function searchMovies(req,res){
                 title: movie.title,
                 year: movie.releaseDate?.split('-')[0] || null,
                 thumbnail: movie.posterPath
-                    ? `https://image.tmdb.org/t/p/w200${movie.posterPath}`
+                    ? `https://image.tmdb.org/t/p/w500${movie.posterPath}` 
                     : null
                 }))
             }
@@ -301,16 +301,16 @@ async function enrichMovie(req,res) {
 //iTunes: Songs
 async function searchSongs (req,res) {
     try{
-        const { query } = req.query;
+        const { q } = req.query;
 
-        if (!query || query.trim().length < 2) {
+        if (!q || q.trim().length < 2) {
             return res.status(400).json({
                 success: false,
                 message: 'Search query is required'
             });
         }
 
-        const results = await itunesService.searchSongs(query);
+        const results = await itunesService.searchSongs(q);
 
         return res.json({
             success: true,
@@ -368,16 +368,16 @@ async function enrichSong(req,res){
 //GoogleBooks: Books
 async function searchBooks(req,res){
     try{
-        const { query } = req.query;
+        const { q } = req.query;
 
-        if (!query || query.trim().length < 2) {
+        if (!q || q.trim().length < 2) {
             return res.status(400).json({
                 success: false,
                 message: 'Search query is required'
             });
         }
 
-        const results = await googleBooksService.searchBooks(query);
+        const results = await googleBooksService.searchBooks(q);
 
         return res.json({
             success: true,

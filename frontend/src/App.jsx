@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import ContentSearch from "./pages/ContentSearch";
 
 function App() {
   return (
@@ -24,6 +25,15 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/search"
+        element={
+          <ProtectedRoute>
+            <ContentSearch />
+          </ProtectedRoute>
+        }
+      />
+
     </Routes>
   );
 }
