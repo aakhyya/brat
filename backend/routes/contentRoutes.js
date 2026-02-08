@@ -3,6 +3,7 @@ const router = express.Router();
 
 const {
     createContent,getAllContent,getContentById,updateContent,deleteContent,searchContent,
+    getUserLibrary,rateContent,toggleFavorite ,
     searchMovies,enrichMovie,searchSongs,enrichSong,searchBooks,enrichBook
 } = require("../controllers/contentController");
 const { protect } = require("../middlewares/auth");
@@ -10,9 +11,12 @@ const { protect } = require("../middlewares/auth");
 // Public routes
 router.get("/", getAllContent);
 router.get("/search", searchContent); 
+router.get("/library",protect,getUserLibrary);
 router.get("/:id", getContentById);
 
 // Protected routes
+router.post("/:contentId/rate", protect, rateContent);
+router.post("/:contentId/favorite", protect, toggleFavorite);
 router.post("/", protect, createContent);
 router.put("/:id", protect, updateContent);
 router.delete("/:id", protect, deleteContent);

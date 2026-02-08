@@ -1,13 +1,14 @@
-import {Routes, Route, Navigate} from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import ContentSearch from "./pages/ContentSearch";
+import Library from "./pages/Library";
 
 function App() {
   return (
-     <Routes>
+    <Routes>
       <Route
         path="/"
         element={<Navigate to="/login" replace />}
@@ -30,6 +31,14 @@ function App() {
         element={
           <ProtectedRoute>
             <ContentSearch />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/library"
+        element={
+          <ProtectedRoute>
+            <Library />
           </ProtectedRoute>
         }
       />

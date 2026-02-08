@@ -106,7 +106,7 @@ function ContentSearch() {
         <div
             className="
       min-h-screen
-      bg-gradient-to-br from-black via-green-900 to-black
+      bg-black
       relative
       text-white
       px-6 py-10
@@ -136,7 +136,7 @@ function ContentSearch() {
                         onClick={() => handleTabChange(tab)}
                         className={`px-6 py-2  tracking-wider rounded-md transition-all duration-300 font-serif
             ${activeTab === tab
-                                ? "bg-chrome-silver/45 border-2 text-black font-bold shadow-[0_0_20px_rgba(34,197,94,0.7)]"
+                                ? "bg-gradient-to-br from-black to-neon-green border-2 text-black font-bold shadow-[0_0_20px_rgba(34,197,94,0.7)]"
                                 : "bg-transparent border border-neon-green/40 text-chrome-silver hover:border-chrome-silver"
                             }`}
                     >
@@ -162,7 +162,7 @@ function ContentSearch() {
                     className="
           w-full max-w-md
           bg-black/40 backdrop-blur-md
-          border border-neon-green/40
+          border border-neon-green
           rounded-md px-4 py-2
           outline-none
           focus:shadow-[0_0_25px_rgba(34,197,94,0.6)]
@@ -175,7 +175,7 @@ function ContentSearch() {
                     onClick={handleSearch} 
                     className="
           px-6 py-2  bg-black/40
-          border border-neon-green/40
+          border border-neon-green
           rounded-md font-bold tracking-wider
           hover:shadow-[0_0_25px_rgba(34,197,94,0.9)]
           transition-shadow duration-300
@@ -186,7 +186,7 @@ function ContentSearch() {
             </div>
 
             {/* Results */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                 {/* Loading */}
                 {loading && <ResultSkeleton />}
 

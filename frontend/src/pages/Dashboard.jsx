@@ -51,8 +51,8 @@ function Dashboard() {
                     <div className="flex items-center justify-between mb-6">
                         {/* Avatar */}
                         <div className="flex justify-between">
-                        <div
-                            className="
+                            <div
+                                className="
                 w-20
                 h-20
                 bg-black
@@ -65,37 +65,39 @@ function Dashboard() {
                 justify-center
                 text-4xl
               "
-                        >
-                            ☠︎︎
-                        </div>
-                        <div className="pl-5">
-                            <h2
-                                className="
+                            >
+                                ☠︎︎
+                            </div>
+                            <div className="pl-5">
+                                <h2
+                                    className="
                   text-3xl
                   font-black
                   text-neon-green
                   mb-2
                   
                 "
-                            >
-                                Welcome {user?.profile?.displayName} ᝰ🚬
-                            </h2>
-                            <p className="text-chrome-silver text-lg">
-                                prove you're not tasteless
-                            </p>
+                                >
+                                    Welcome {user?.profile?.displayName} ᝰ🚬
+                                </h2>
+                                <p className="text-chrome-silver text-lg">
+                                    prove you're not tasteless
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                        
-                    {/* Primary Action: Search Content */}
-                    <div className="mb-8 flex justify-center">
-                        <Link to="/search">
-                            <Button variant="secondary">
-                                Search Content
-                            </Button>
-                        </Link>
-                    </div>
 
-                        
+                        {/* Primary Action: Search Content */}
+                        <div className="mb-8 flex flex-col justify-center">
+                            <Link to="/search"
+                                className="text-neon-green hover:text-neon-purple">
+                                    ✰ Search Content
+                            </Link>
+
+                            <Link to="/library"
+                                className="text-neon-green hover:text-neon-purple">
+                                ✰ My Library
+                            </Link>
+                        </div>
                     </div>
 
                     {/* Info Grid */}

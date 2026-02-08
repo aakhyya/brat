@@ -231,6 +231,221 @@ async function searchContent(req,res){ //combine text score + popularity
     }
 }
 
+async function getUserLibrary(req,res){
+    try{
+        const userId=req.user._id;
+        const {type, sort = "createdAt", page = 1, limit = 20} = req.query;
+
+        const pageNumber=Math.max(parseInt(page),1);
+        const pageSize=Math.min(parseInt(limit),20);
+        const skip=(pageNumber-1)*pageSize;
+
+        const matchStage={
+            userId: new mongoose.Types.ObjectId(userId),
+            type: 'rate' 
+        };
+
+        const pipeline=[
+            {$match: matchStage}, //Only look for this user's docs
+            {
+                $lookup:{ //Joins equivalent
+                    from:"contents", //Mongo Table name
+                    localField:"contentId", //Interaction.contentId=Content._id
+                    foreignField:"_id",
+                    as:"content",//returns new array 'content' of joined values
+                },
+            },
+            {$unwind:"$content"}, //converts the array to plain object, removes broken joins
+        ];
+
+        if (type && type !== 'all') {
+            pipeline.push({
+                $match: { 'content.type': type } //type
+            });
+        }
+
+        //Sorting
+        if(sort==="rating"){
+            pipeline.push({$sort:{rating:-1}}); //highest rating
+        }
+        else if(sort==="title"){
+            pipeline.push({$sort:{'content.title': 1}}); //A-Z
+        }
+        else{
+            pipeline.push({$sort:{createdAt:-1}}); //Latest Interactions
+        }
+
+        //Pagination
+        pipeline.push(
+            {$skip:skip},
+            {$limit:pageSize},
+        );
+
+        //Final response
+        pipeline.push({
+            $project:{
+                _id: 0,
+                rating: '$value',  // map value to rating for frontend
+                isFavorite: false,   // check if type is 'like'
+                createdAt: 1,
+                content:{
+                    _id: 1,
+                    type: 1,
+                    title: 1,
+                    images: 1,
+                    releaseDate: 1,
+                    metadata: 1,
+                    creators:1,
+                },
+            },
+        });
+
+        const totalCount = await Interaction.countDocuments(matchStage);
+
+        //Aggregation
+        const library=await Interaction.aggregate(pipeline); 
+        if (library.length === 0 && pageNumber === 1) {
+            return res.status(200).json({
+                success: true,
+                message: "Your library is empty. Start by searching for content!",
+                data: [],
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            page: pageNumber,
+            totalPages: Math.ceil(totalCount / pageSize),
+            totalItems: totalCount,
+            itemsPerPage: pageSize,
+            data: library,
+        });
+    }
+    catch(err){
+        console.error(err);
+        res.status(500).json({
+        success: false,
+        message: "Failed to fetch user library",
+        });
+    }
+}
+
+async function rateContent(req,res){
+    try{
+        const userId=req.user._id;
+
+        const {contentId}=req.params;
+        if (!mongoose.Types.ObjectId.isValid(contentId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid content ID",
+            });
+        }
+
+        const {rating}=req.body;
+        if (!rating || rating < 1 || rating > 5) {
+            return res.status(400).json({
+                success: false,
+                message: "Rating must be between 1 and 5",
+            });
+        }
+
+        const contentExists=await Content.findById(contentId);
+        if(!contentExists){
+            return res.status(404).json({
+                success:false,
+                message:"Content not found",
+            });
+        }
+        
+         // Upsert interaction
+        const interaction = await Interaction.findOneAndUpdate(
+            { //filter: find the docs
+                userId,
+                contentId,
+                type:"rate"
+            },
+            { //update: set -> only update rating, everything else remains
+                $set: {
+                    type: 'rate',
+                    value: rating
+                },
+            },
+            { 
+                new: true, //By default, Mongo returns old, we return new
+                upsert: true, //If document exists → update it, NOT exist → insert a new one
+                setDefaultsOnInsert: true, //only for new docs -> ensures schema rules apply
+            }  
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "Rating saved",
+            data: interaction,
+        });
+    }
+    catch(err){
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            message: "Failed to rate content",
+        });
+    }
+}
+
+async function toggleFavorite (req,res){
+    try{
+        const userId=req.user._id;
+
+        const {contentId}=req.params;
+        if (!mongoose.Types.ObjectId.isValid(contentId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid content ID",
+            });
+        }
+
+        const contentExists = await Content.findById(contentId);
+        if (!contentExists) {
+            return res.status(404).json({
+                success: false,
+                message: "Content not found",
+            });
+        }
+
+        let interaction = await Interaction.findOne({ userId, contentId , type:"like"});
+        let isFavorite;
+
+        if (!interaction) {
+        // No interaction → create with favorite = true
+            interaction = await Interaction.create({
+                userId,
+                contentId,
+                type: 'like',
+                value: 1,
+            });
+            isFavorite=true;
+        } else {
+            // Remove like (delete the interaction)
+            await Interaction.deleteOne({ _id: interaction._id });
+            isFavorite=false;
+        }
+        
+        res.status(200).json({
+            success: true,
+            message: isFavorite ? "Added to favorites" : "Removed from favorites",
+            data: { isFavorite },
+        });
+    }
+    catch(err){
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            message: "Failed to toggle favorite",
+        });
+    }
+}
+
 //TMDB: Movies
 async function searchMovies(req,res){
     try{
@@ -249,6 +464,7 @@ async function searchMovies(req,res){
                 results: results.map(movie => ({
                 externalId: movie.tmdbId,
                 title: movie.title,
+                subtitle: movie.releaseDate?.split('-')[0] || 'Unknown Year',
                 year: movie.releaseDate?.split('-')[0] || null,
                 thumbnail: movie.posterPath
                     ? `https://image.tmdb.org/t/p/w500${movie.posterPath}` 
@@ -435,5 +651,6 @@ async function enrichBook(req,res){
 
 module.exports={
     createContent,getAllContent,getContentById,updateContent,deleteContent,searchContent,
+    getUserLibrary, rateContent,toggleFavorite ,
     searchMovies,enrichMovie,searchSongs,enrichSong,searchBooks,enrichBook
 };

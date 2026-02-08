@@ -43,14 +43,13 @@ function ResultCard({ item, type, onAdd }) {
     }
 
     return (
-        <div
-            className="
+        <div className="
                 bg-black/40 backdrop-blur-md
                 border border-green-400/30
                 rounded-lg overflow-hidden
                 hover:border-green-400
                 hover:shadow-[0_0_20px_rgba(34,197,94,0.5)]
-                transition-all duration-300">
+                transition-all duration-300 flex flex-col h-full">
 
             {/* Thumbnail */}
             <div className="w-full aspect-square bg-black/60 overflow-hidden">
@@ -70,12 +69,12 @@ function ResultCard({ item, type, onAdd }) {
             </div>
 
             {/* Content */}
-            <div className="p-4 flex flex-col gap-3">
+            <div className="p-4 flex flex-col flex-1 gap-3">
                 <div>
                     <h3
                         className="
                             text-xl font-bold
-                            bg-gradient-to-r from-green-400 to-purple-400
+                            bg-green-400
                             bg-clip-text text-transparent">
                         
                         {title}

@@ -110,4 +110,25 @@ export const contentApi = { //One single object, no duplication of fetch
             throw err;
         }
     },
+
+    getUserLibrary: async(filter, sortBy, page = 1) => {
+        try{
+            const params = {};
+
+            if (filter !== "all") params.type = filter;
+
+            if (sortBy === "rating") params.sort = "rating";
+            if (sortBy === "newest") params.sort = "createdAt";
+            if (sortBy === "az") params.sort = "title";
+
+            params.page = page;
+
+            const res = await api.get("/api/content/library", { params });
+            return res.data?.data?.results || [];
+        }
+        catch(err){
+            handleApiError(err,"Failed to fetch library");
+            return [];
+        }
+    }
 };
