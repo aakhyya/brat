@@ -88,7 +88,12 @@ function Dashboard() {
 
                         {/* Primary Action: Search Content */}
                         <div className="mb-8 flex flex-col justify-center">
-                            <Link to="/search"
+                            <Link to="/home">
+                            <Button variant="secondary">
+                                enter brat
+                            </Button>
+                            </Link>
+                            {/* <Link to="/search"
                                 className="text-neon-green hover:text-neon-purple">
                                     ✰ Search Content
                             </Link>
@@ -96,7 +101,7 @@ function Dashboard() {
                             <Link to="/library"
                                 className="text-neon-green hover:text-neon-purple">
                                 ✰ My Library
-                            </Link>
+                            </Link> */}
                         </div>
                     </div>
 

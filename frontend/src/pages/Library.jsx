@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { contentApi } from "../services/contentApi";
+import StarRating from "../components/ui/StarRating";
 
 function Library() {
     const [library, setLibrary] = useState([]);
@@ -28,21 +29,30 @@ function Library() {
         fetchLibrary();
     }, [filter, sortBy, page]);
     return (
-        <div className="bg-gradient-to-br from-black via-purple-900/50 to-black min-h-screen px-6 py-10">
+        <div className=" min-h-screen
+      bg-black
+      relative
+      text-white
+      px-6 py-10">
 
             {/* Header */}
             <h1
                 className="
-        text-6xl font-black uppercase text-center mb-8
-        bg-gradient-to-r from-gray-200 via-gray-400 to-gray-200
-        bg-clip-text text-transparent
+                                text-7xl
+                                md:text-4xl
+                                font-serif
+                                font-black
+                                uppercase
+                                text-chrome
+                                mb-10 
+                                text-center
       "
             >
                 MY LIBRARY
             </h1>
 
             {/* Filters */}
-            <div className="flex justify-center gap-4 mb-6 flex-wrap">
+            <div className="flex justify-center gap-4 mb-10 flex-wrap">
                 {["all", "movie", "song", "book"].map((f) => {
                     const active = filter === f;
 
@@ -56,8 +66,8 @@ function Library() {
                             className={`
               px-6 py-2 border-2 transition-all
               ${active
-                                    ? "border-green-400 bg-gradient-to-r from-green-400 to-purple-500 text-black font-bold shadow-[0_0_20px_rgba(34,197,94,0.7)]"
-                                    : "border-purple-500/30 bg-transparent text-purple-400 hover:border-purple-400"
+                                    ? "border-chrome-silver-400 bg-gradient-to-br from-black to-neon-green text-black font-bold shadow-[0_0_20px_rgba(34,197,94,0.7)]"
+                                    : "border-neon-green/30 bg-transparent text-chrome-silver-400 hover:border-chrome-silver"
                                 }
             `}
                         >
@@ -67,24 +77,25 @@ function Library() {
                 })}
             </div>
 
-            {/* Sort Dropdown */}
             <div className="flex justify-center mb-8">
                 <select
-                    value={sortBy}
-                    onChange={(e) => {
-                        setSortBy(e.target.value);
-                        setPage(1);
-                    }}
-                    className="
-          bg-black/40 border border-green-400/40
-          px-4 py-2 rounded-md text-green-300
-          focus:outline-none
-          focus:shadow-[0_0_15px_rgba(34,197,94,0.6)]
-        "
-                >
-                    <option value="newest">Newest</option>
-                    <option value="rating">Highest Rated</option>
-                    <option value="az">A–Z</option>
+  value={sortBy}
+  onChange={(e) => {
+    setSortBy(e.target.value);
+    setPage(1);
+  }}
+  className="
+    bg-black/70
+    border border-neon-green/50
+    px-4 py-2 rounded-md
+    text-neon-green
+    font-semibold
+    focus:outline-none
+    focus:border-neon-green
+    focus:shadow-[0_0_15px_rgba(34,197,94,0.6)]">
+                    <option value="newest">latest</option>
+                    <option value="rating">highest rated</option>
+                    <option value="az">a-z</option>
                 </select>
             </div>
 
@@ -103,12 +114,12 @@ function Library() {
             {/* Empty State */}
             {!loading && library.length === 0 && (
                 <div className="text-center text-purple-300 mt-20">
-                    <p className="text-xl mb-4">Your library is empty.</p>
+                    <p className="text-xl mb-4">you're giving tasteless❗</p>
                     <a
                         href="/search"
-                        className="text-green-400 underline hover:text-green-300"
+                        className="text-green-400 underline hover:text-green-300 no-underline"
                     >
-                        Discover content →
+                        go discover content ᯓ➤
                     </a>
                 </div>
             )}
@@ -133,11 +144,26 @@ function Library() {
                                 {item.content.type.toUpperCase()}
                             </p>
 
-                            {item.rating && (
-                                <p className="text-green-400 mt-2">
-                                    ⭐ {item.rating}
-                                </p>
-                            )}
+                            <StarRating
+  rating={item.rating || 0}
+  onRate={async (newRating) => {
+    try {
+      await contentApi.rateContent(item.content._id, newRating);
+
+      // optimistic UI update
+      setLibrary((prev) =>
+        prev.map((libItem) =>
+          libItem.content._id === item.content._id
+            ? { ...libItem, rating: newRating }
+            : libItem
+        )
+      );
+    } catch (err) {
+      console.error("Failed to rate content", err);
+    }
+  }}
+/>
+
 
                             {item.isFavorite && (
                                 <p className="text-pink-400 mt-1">
