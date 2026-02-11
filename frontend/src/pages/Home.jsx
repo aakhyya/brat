@@ -13,18 +13,21 @@ function Home() {
     async function fetchStats() {
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/content/library/stats`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
+          `${import.meta.env.VITE_API_URL}/api/content/library?limit=100`,  // ✅ Use existing endpoint
+          { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
         );
 
         const data = await res.json();
-        if (res.ok) setStats(data);
+        const counts = data.data.reduce((acc, item) => {
+          const type = item.content.type;
+          acc[type] = (acc[type] || 0) + 1;
+          return acc;
+        }, {});
+
+        setStats({ movies: counts.movie || 0, songs: counts.song || 0, books: counts.book || 0 });
+
       } catch (err) {
-        console.error("Failed to load stats",err);
+        console.error("Failed to load stats", err);
       } finally {
         setLoadingStats(false);
       }
@@ -51,23 +54,26 @@ function Home() {
           {
             icon: "🎞️",
             title: "explore movies",
-            desc: `${loadingStats ? <span className="text-gray-400 animate-pulse">loading movies…</span> 
-                                  : stats?.movies || 0} movies`,
-            path: "/search/movie",
+            desc: loadingStats 
+                  ? "loading..." 
+                  : `${stats?.movies || 0} movies`,
+            path: "/search",
           },
           {
             icon: "💿",
             title: "discover music",
-            desc: `${loadingStats ? <span className="text-gray-400 animate-pulse">loading songs…</span> 
-                                  : (stats?.songs || 0)} songs`,
-            path: "/search/song",
+            desc: loadingStats 
+                  ? "loading..." 
+                  : `${stats?.songs || 0} songs`,
+            path: "/search",
           },
           {
             icon: "📖",
             title: "browse books",
-            desc: `${loadingStats ? <span className="text-gray-400 animate-pulse">loading books...</span> 
-                                  : (stats?.books || 0)} books`,
-            path: "/search/book",
+            desc: loadingStats 
+                  ? "loading..." 
+                  : `${stats?.books || 0} books`,
+            path: "/search",
           },
           {
             icon: "🪩",

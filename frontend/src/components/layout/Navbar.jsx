@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 
@@ -7,6 +7,20 @@ function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+
+    useEffect(() => {
+    if (!open) return;
+    
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.user-menu')) {  // Add class to menu container
+        setOpen(false);
+      }
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [open]);
+
 
   const navLinks = [
     { name: "Search Content", path: "/search" },
@@ -46,8 +60,7 @@ function Navbar() {
         {/* ================= CENTER: NAV LINKS ================= */}
         <div className="hidden md:flex gap-1">
           {navLinks.map((link) => {
-            const isActive = location.pathname.startsWith(link.path);
-
+            const isActive = location.pathname === link.path;
             return (
               <Link
                 key={link.name}
@@ -70,8 +83,7 @@ function Navbar() {
               </Link>
             );
           })}
-        
-
+          
         
           <button
             onClick={() => setOpen((prev) => !prev)}
@@ -82,7 +94,7 @@ function Navbar() {
               rounded-md
               text-gray-200
               hover:shadow-[0_0_15px_rgba(34,197,94,0.6)]
-              transition-shadow
+              transition-shadow user-menu
             "
           >
             <span className="text-sm font-medium">
@@ -98,7 +110,7 @@ function Navbar() {
                 bg-black/90 backdrop-blur-md
                 border border-green-400/30
                 rounded-md overflow-hidden
-                shadow-lg
+                shadow-lg menu
               "
             >
               <button

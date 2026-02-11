@@ -45,7 +45,7 @@ function Signup(){
 
         try{
             await signup(email,password,displayName);
-            navigate("/dashboard");
+            navigate("/");
         }
         catch(err){
             console.error("Sign Up failed", err);

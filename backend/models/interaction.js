@@ -1,53 +1,50 @@
-//Content Model: what exists?
-//Interaction Model: what do users do with it, how often, in what context, and when?
-const mongoose=require("mongoose");
+const mongoose = require("mongoose");
 
-const interactionSchema=new mongoose.Schema(
+const interactionSchema = new mongoose.Schema(
     {
-        userId:{
+        userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
             index: true,
         },
-        contentId:{
+        contentId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Content",
             required: true,
             index: true,
         },
-        type:{
-            type:String,
-            required:true,
-            enum:["view","like","dislike","rate","share","save","skip","detailed_view","time_spent"],//to avoid typos
+        type: {
+            type: String,
+            required: true,
+            enum: ["view", "like", "dislike", "rate", "share", "save", "skip", "detailed_view", "time_spent"],
         },
-        value:{ //Eg.: rate: 5 -> avg(value) WHERE type = "rate"
-            type:Number,
-            required:true,
+        value: {
+            type: Number,
         },
-        context: {//under what conditions an interaction happened
-            source:{
+        context: {
+            source: {
                 type: String,
                 enum: ["recommendation", "search", "browse", "social"],
             },
-            sessionId: String, //group interactions that happened together -> recommendation sequencing
-            timestamp: {//createdAt → when Mongo saved the document
-                type: Date,// context.timestamp → when the event actually happened
+            sessionId: String,
+            timestamp: {
+                type: Date,
                 default: Date.now,
             },
-            deviceType: String, //phone, laptop etc.
+            deviceType: String,
         },
     },
     {
-        timestamps:true,
-    },
+        timestamps: true,
+    }
 );
 
-//Compound Indexes(for multifield query): Indexes consume memory -> too many indexes slow writes
-interactionSchema.index({userId:1 , contentId:1});//Did user X interact with content Y?
-interactionSchema.index({userId:1 ,type:1});//All likes by user X
-interactionSchema.index({contentId:1 ,type:1});//All ratings for this content
-interactionSchema.index({"context.timestamp":-1});//Recent interactions
+// Compound Indexes
+interactionSchema.index({ userId: 1, contentId: 1 });
+interactionSchema.index({ userId: 1, type: 1 });
+interactionSchema.index({ contentId: 1, type: 1 });
+interactionSchema.index({ "context.timestamp": -1 });
 
-const Interaction=mongoose.model("Interaction",interactionSchema);
-module.exports=Interaction;
+const Interaction = mongoose.model("Interaction", interactionSchema);
+module.exports = Interaction;

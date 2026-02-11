@@ -18,13 +18,17 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
 
-//Routes
+// Routes
 app.get("/", (req, res) => {
   res.json({ message: "Hello from brat" });
 });
-app.use('/api/',apiLimiter);
+
+// Auth routes with auth-specific rate limiter
 app.use('/api/auth', authRoutes);
-app.use("/api/content", contentRoutes);
+
+// Content routes with general rate limiter
+app.use('/api/content', apiLimiter, contentRoutes);
+
 
 //404 Handler
 app.use((req,res)=>{

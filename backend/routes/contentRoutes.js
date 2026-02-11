@@ -3,7 +3,7 @@ const router = express.Router();
 
 const {
     createContent,getAllContent,getContentById,updateContent,deleteContent,searchContent,
-    getUserLibrary,rateContent,toggleFavorite ,
+    getUserLibrary,rateContent,toggleFavorite,deleteInteraction,
     searchMovies,enrichMovie,searchSongs,enrichSong,searchBooks,enrichBook
 } = require("../controllers/contentController");
 const { protect } = require("../middlewares/auth");
@@ -17,6 +17,7 @@ router.get("/:id", getContentById);
 // Protected routes
 router.post("/:contentId/rate", protect, rateContent);
 router.post("/:contentId/favorite", protect, toggleFavorite);
+router.delete("/:contentId/interaction", protect, deleteInteraction);
 router.post("/", protect, createContent);
 router.put("/:id", protect, updateContent);
 router.delete("/:id", protect, deleteContent);

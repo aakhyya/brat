@@ -4,7 +4,6 @@ function StarRating({
   rating = 0,
   onRate,
   readonly = false,
-  size = "text-2xl",
 }) {
   const [hoverRating, setHoverRating] = useState(0);
 
@@ -27,18 +26,17 @@ function StarRating({
             onClick={() => {
               if (!readonly && onRate) onRate(star);
             }}
-            className={`
-              ${size}
+            className={`text-2xl
               transition-all duration-200
               ${readonly ? "cursor-default opacity-80" : "cursor-pointer"}
               ${
                 filled
-                  ? "text-yellow-400 filter drop-shadow-[0_0_8px_rgba(250,204,21,0.8)] hover:scale-125"
-                  : "text-gray-600 hover:scale-110"
+                  ? "text-pink-300 filter drop-shadow-[0_0_8px_rgba(250,204,21,0.8)] hover:scale-125"
+                  : "text-zinc-300 hover:scale-110"
               }
             `}
           >
-            {filled ? "⭐" : "☆"}
+            {filled ? "✟" : "✞"}
           </span>
         );
       })}

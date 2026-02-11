@@ -241,8 +241,7 @@ async function getUserLibrary(req,res){
         const skip=(pageNumber-1)*pageSize;
 
         const matchStage={
-            userId: new mongoose.Types.ObjectId(userId),
-            type: 'rate' 
+            userId: new mongoose.Types.ObjectId(userId)
         };
 
         const pipeline=[
@@ -283,22 +282,22 @@ async function getUserLibrary(req,res){
 
         //Final response
         pipeline.push({
-            $project:{
-                _id: 0,
-                rating: '$value',  // map value to rating for frontend
-                isFavorite: false,   // check if type is 'like'
+            $project: {
+                rating: '$value',
                 createdAt: 1,
-                content:{
+                content: {
                     _id: 1,
                     type: 1,
                     title: 1,
+                    description:1,
                     images: 1,
                     releaseDate: 1,
                     metadata: 1,
-                    creators:1,
+                    creators: 1,
                 },
-            },
+            }
         });
+
 
         const totalCount = await Interaction.countDocuments(matchStage);
 
@@ -367,8 +366,10 @@ async function rateContent(req,res){
             },
             { //update: set -> only update rating, everything else remains
                 $set: {
-                    type: 'rate',
-                    value: rating
+                    value: rating,
+                },
+                $setOnInsert: { 
+                    userId, contentId, type: 'rate',
                 },
             },
             { 
@@ -444,6 +445,48 @@ async function toggleFavorite (req,res){
             message: "Failed to toggle favorite",
         });
     }
+}
+
+async function deleteInteraction(req, res) {
+  try {
+    const userId = req.user._id;
+    const { contentId } = req.params;
+
+    // 1️⃣ Validate contentId
+    if (!mongoose.Types.ObjectId.isValid(contentId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid content ID",
+      });
+    }
+
+    // 2️⃣ Delete all interactions between this user and this content
+    const result = await Interaction.deleteMany({
+      userId,
+      contentId,
+    });
+
+    // 3️⃣ If nothing was deleted
+    if (result.deletedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No interaction found for this content",
+      });
+    }
+
+    // 4️⃣ Success response
+    res.status(200).json({
+      success: true,
+      message: "Interaction deleted successfully",
+    });
+
+  } catch (error) {
+    console.error("Delete Interaction Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete interaction",
+    });
+  }
 }
 
 //TMDB: Movies
@@ -651,6 +694,6 @@ async function enrichBook(req,res){
 
 module.exports={
     createContent,getAllContent,getContentById,updateContent,deleteContent,searchContent,
-    getUserLibrary, rateContent,toggleFavorite ,
+    getUserLibrary, rateContent,toggleFavorite,deleteInteraction,
     searchMovies,enrichMovie,searchSongs,enrichSong,searchBooks,enrichBook
 };

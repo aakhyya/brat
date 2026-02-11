@@ -111,8 +111,8 @@ export const contentApi = { //One single object, no duplication of fetch
         }
     },
 
-    getUserLibrary: async(filter, sortBy, page = 1) => {
-        try{
+    getUserLibrary: async (filter, sortBy, page = 1) => {
+        try {
             const params = {};
 
             if (filter !== "all") params.type = filter;
@@ -124,11 +124,43 @@ export const contentApi = { //One single object, no duplication of fetch
             params.page = page;
 
             const res = await api.get("/api/content/library", { params });
-            return res.data?.data?.results || [];
+            return res.data?.data || [];
         }
-        catch(err){
-            handleApiError(err,"Failed to fetch library");
+        catch (err) {
+            handleApiError(err, "Failed to fetch library");
             return [];
         }
-    }
+    },
+
+    rateContent: async (contentId, rating) => {
+        try {
+            const res = await api.post(`/api/content/${contentId}/rate`, { rating });
+            return res.data?.data;
+        } catch (err) {
+            handleApiError(err, "Failed to rate content");
+        }
+    },
+
+    toggleFavorite: async (contentId) => {
+        try {
+            const res = await api.post(`/api/content/${contentId}/favorite`);
+            return res.data;  // returns { success, message, data: { isFavorite } }
+        } catch (err) {
+            handleApiError(err, "Failed to toggle favorite");
+        }
+    },
+
+    deleteInteraction: async (contentId) => {
+        try {
+            const res = await api.delete(
+                `/api/content/${contentId}/interaction`
+            );
+
+            return res.data; // { success, message }
+        } catch (err) {
+            handleApiError(err, "Failed to delete interaction");
+        }
+    },
+
+
 };
