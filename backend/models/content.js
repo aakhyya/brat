@@ -20,6 +20,8 @@ const creatorSchema=new mongoose.Schema(
     }
 );
 
+const FEATURE_DIMENSIONS = 30; //For AI-Vector Graph
+
 const contentSchema=new mongoose.Schema(
     {
         //Common for all types
@@ -76,6 +78,17 @@ const contentSchema=new mongoose.Schema(
             },
             lastProcessed:Date,
             processingVersion:String,
+        },
+        //Vector Graph
+        featureVector:{
+            type:[Number],
+            default:[],
+            validate:{
+                validator:function(v){
+                    return v.length===0 || v.length===30;//older content might not have it yet
+                },
+                message: "Feature vector must have 30 dimensions",
+            },
         },
     },
     {

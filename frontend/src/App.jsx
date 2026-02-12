@@ -7,6 +7,7 @@ import Library from "./pages/Library";
 import Home from "./pages/Home";
 import Layout from "./components/layout/Layout";
 import Dashboard from "./pages/Dashboard";
+import TasteProfile from "./pages/TasteProfile";
 
 function App() {
   return (
@@ -27,6 +28,12 @@ function App() {
       <Route path="/search" element={
         <ProtectedRoute>
           <Layout><ContentSearch /></Layout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/taste-graph" element={
+        <ProtectedRoute>
+          <Layout><TasteProfile/></Layout>
         </ProtectedRoute>
       } />
 

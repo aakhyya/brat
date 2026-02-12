@@ -140,4 +140,82 @@ async function getMe(req, res) {
   }
 };
 
-module.exports={signup,login,getMe};
+const DIMENSION_LABELS = [
+  // 0–9 Genres
+  "Action", "Comedy", "Drama", "Horror", "Romance",
+  "Sci-Fi", "Thriller", "Fantasy", "Documentary", "Mystery",
+
+  // 10–15 Mood
+  "Uplifting", "Dark Mood", "Intense", "Calm",
+  "Energetic", "Emotional",
+
+  // 16–21 Themes
+  "Love Theme", "Revenge Theme", "Coming-of-Age",
+  "Survival", "Power Struggles", "Identity",
+
+  // 22–25 Era
+  "Classic Era", "Modern Era",
+  "Contemporary Era", "Futuristic",
+
+  // 26–29 Complexity
+  "Simple Storytelling", "Layered Storytelling",
+  "Experimental Style", "Fast-Paced"
+];
+
+async function getTasteProfile(req, res) {
+  try {
+    const userId = req.user._id;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    const vector = user.tasteVector;
+
+    if (!vector || vector.length !== 30) {
+      return res.status(200).json({
+        success: true,
+        strongPreferences: [],
+        weakPreferences: [],
+        message: "No taste data yet. Rate some content!"
+      });
+    }
+
+    const mapped = vector.map((value, index) => ({
+      dimension: DIMENSION_LABELS[index],
+      value
+    }));
+
+    // Strongest (highest absolute values)
+    const strongPreferences = [...mapped]
+      .sort((a, b) => Math.abs(b.value) - Math.abs(a.value))
+      .slice(0, 5);
+
+    // Weakest (closest to zero)
+    const weakPreferences = [...mapped]
+      .sort((a, b) => Math.abs(a.value) - Math.abs(b.value))
+      .slice(0, 5);
+
+    res.status(200).json({
+  success: true,
+  data: {
+    strongPreferences,
+    weakPreferences
+  }
+});
+
+  } catch (error) {
+    console.error("Taste profile error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch taste profile"
+    });
+  }
+}
+
+module.exports={signup,login,getMe,getTasteProfile};

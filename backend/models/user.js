@@ -39,31 +39,16 @@ const userSchema = new mongoose.Schema(
         },
         //Taste Vector
         tasteVector: {
-            version: { // v1 will judge based on 1 criteria, if another criteria added, we'll use v2. 
-                type: Number,
-                default: 1,
-            },
-            attributes: { // (string,number) => "genre:thriller": 0.82
-                type: Map,
-                of: Number,
-                default:() => new Map(),
-            },
-            confidence: { // How sure are we about every attribute, prevents “one movie ruined my feed” syndrome
-                        // Eg.: attributes: {"aesthetic:arthouse": 0.6},
-                        // confidence: {"aesthetic:arthouse": 0.2} => early signal, don't overtrust.
-                type: Map,
-                of: Number,
-                default: () => new Map(),
-            },
-            lastUpdated: { //decay logic (older tastes matter less)
-                type: Date,
-                default: Date.now,
-            },
-            updateCount: { //updateCount<5 → onboarding phase; updateCount>50 → strong personalization allowed
-                type: Number,
-                default: 0,
-            },
+            type: [Number],
+            default: () => new Array(30).fill(0),
+            validate: {
+                validator: function(v) {
+                    return v.length === 30;
+                },
+                message: "Taste vector must have 30 dimensions"
+            }
         },
+
         onboardingCompleted: {
             type: Boolean,
             default: false,
