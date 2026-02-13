@@ -1,9 +1,10 @@
 const mongoose = require("mongoose");
-const User=require("../models/user");
+const User = require("../models/user");
 const Content = require("../models/content");
 const Interaction = require("../models/interaction");
 const featureExtractor = require("../services/featureExtractor");
 const tasteVectorService = require("../services/tasteVectorService");
+const recommendationService = require("../services/recommendationService");
 const tmdbService = require('../services/tmdbService');
 const itunesService = require('../services/itunesService');
 const googleBooksService = require('../services/googleBooksService');
@@ -508,6 +509,56 @@ async function deleteInteraction(req, res) {
     }
 }
 
+//If you don't have to use .save, .populate or schema methods: For faster execution: use .lean()
+//Mongoose returns a Mongoose Document with extra methods but with .lean() it's plain JavaScript object
+async function getRecommendations(req, res) {
+    try {
+        const userId = req.user._id;
+
+        const user = await User.findById(userId).lean();
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        //For new users recommend globally popular content
+        if (!user.tasteVector || user.tasteVector.length === 0) {
+            const popular = await Content.find().sort({ likeCount: -1 }).limit(20);
+            return res.status(200).json({ recommendations: popular });
+        }
+        
+        const allContent = await Content.find({
+            featureVector: { $exists: true, $ne: [] }
+        }).lean();
+        if (!allContent.length) {
+            return res.status(200).json({
+                message: "No content available for recommendations.",
+                recommendations: []
+            });
+        }
+
+        const interactions = await Interaction.find({ userId }).lean();
+        user.interactions = interactions;
+
+        const recommendations = recommendationService.getRecommendations(
+            user,
+            allContent,
+            20
+        );
+
+        return res.status(200).json({
+            count: recommendations.length,
+            recommendations
+        });
+
+    } 
+    catch (error) {
+        console.error("Recommendation error:", error);
+        return res.status(500).json({
+            message: "Failed to generate recommendations",
+            error: error.message
+        });
+    }
+}
+
 //TMDB: Movies
 async function searchMovies(req, res) {
     try {
@@ -719,6 +770,6 @@ async function enrichBook(req, res) {
 
 module.exports = {
     createContent, getAllContent, getContentById, updateContent, deleteContent, searchContent,
-    getUserLibrary, rateContent, toggleFavorite, deleteInteraction,
+    getUserLibrary, rateContent, toggleFavorite, deleteInteraction,getRecommendations,
     searchMovies, enrichMovie, searchSongs, enrichSong, searchBooks, enrichBook
 };

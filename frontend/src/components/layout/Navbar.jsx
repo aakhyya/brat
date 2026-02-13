@@ -24,9 +24,8 @@ function Navbar() {
 
   const navLinks = [
     { name: "Search Content", path: "/search" },
+    {name:"Recommendations", path:"/recommendations"},
     { name: "My Library", path: "/library" },
-    // future:
-    // { name: "Recommendations", path: "/recommendations" },
     // { name: "Explore", path: "/explore" },
   ];
 

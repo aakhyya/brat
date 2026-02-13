@@ -3,6 +3,7 @@ import { contentApi } from "../services/contentApi";
 import ResultSkeleton from "../components/content/ResultSkeleton";
 import ErrorMessage from "../components/content/ErrorMessage";
 import ResultCard from "../components/content/ResultCard";
+import StarRating from "../components/ui/StarRating";
 
 function ContentSearch() {
     const [activeTab, setActiveTab] = useState("movie"); //movie song book
@@ -10,6 +11,7 @@ function ContentSearch() {
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [ratingModal, setRatingModal] = useState(null);
 
     const debounceRef = useRef(null); //updating Refs does NOT cause re-renders, hence
     const lastSearchRef = useRef(""); //perfect for timers and mutable values
@@ -103,7 +105,7 @@ function ContentSearch() {
     }
 
     return (
-        
+
         <div
             className="
       min-h-screen
@@ -149,7 +151,7 @@ function ContentSearch() {
             {/* Search Bar */}
             <div className="flex justify-center gap-4 mb-12">
                 <input
-                    type="search" 
+                    type="search"
                     aria-label={`Search ${activeTab}s`}  // Screen readers
                     autoComplete="off"
                     value={searchQuery}
@@ -172,8 +174,8 @@ function ContentSearch() {
                 />
 
                 <button
-                    type="button" 
-                    onClick={handleSearch} 
+                    type="button"
+                    onClick={handleSearch}
                     className="
           px-6 py-2  bg-black/40
           border border-neon-green
@@ -217,11 +219,28 @@ function ContentSearch() {
                             key={item.externalId}
                             item={item}
                             type={activeTab}
-                            onAdd={() => { }}
+                            onAdd={(savedContent) => {
+                                setRatingModal(savedContent); //Open rating modal with this content
+                            }}
                         />
                     ))}
             </div>
-            
+            {ratingModal && (
+                <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
+                    <div className="bg-black border-2 border-green-400 p-8 rounded-lg">
+                        <h3 className="text-2xl mb-4">Rate <span className="text-neon-green">{ratingModal.content.title}</span></h3>
+                        <StarRating
+                            rating={0}
+                            onRate={async (rating) => {
+                                await contentApi.rateContent(ratingModal.content._id, rating);
+                                setRatingModal(null);
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
+
+
         </div>
     );
 

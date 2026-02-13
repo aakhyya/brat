@@ -8,13 +8,14 @@ import Home from "./pages/Home";
 import Layout from "./components/layout/Layout";
 import Dashboard from "./pages/Dashboard";
 import TasteProfile from "./pages/TasteProfile";
+import Recommendations from "./pages/Recommendations";
 
 function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-
+      
       <Route path="/" element={
         <ProtectedRoute><Dashboard/></ProtectedRoute>
       } />
@@ -40,6 +41,12 @@ function App() {
       <Route path="/library" element={
         <ProtectedRoute>
           <Layout><Library /></Layout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/recommendations" element={
+        <ProtectedRoute>
+          <Layout><Recommendations /></Layout>
         </ProtectedRoute>
       } />
     </Routes>
