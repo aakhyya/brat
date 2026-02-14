@@ -1,3 +1,25 @@
+const DIMENSION_LABELS = [
+  // 0–9 Genres
+  "Action", "Comedy", "Drama", "Horror", "Romance",
+  "Sci-Fi", "Thriller", "Fantasy", "Documentary", "Mystery",
+
+  // 10–15 Mood
+  "Uplifting", "Dark Mood", "Intense", "Calm",
+  "Energetic", "Emotional",
+
+  // 16–21 Themes
+  "Love Theme", "Revenge Theme", "Coming-of-Age",
+  "Survival", "Power Struggles", "Identity",
+
+  // 22–25 Era
+  "Classic Era", "Modern Era",
+  "Contemporary Era", "Futuristic",
+
+  // 26–29 Complexity
+  "Simple Storytelling", "Layered Storytelling",
+  "Experimental Style", "Fast-Paced"
+];
+
 class RecommendationService{
     //User loves action; Content is heavy action → Score close to 1
     calculateSimilarity(userVector, contentVector){
@@ -48,11 +70,35 @@ class RecommendationService{
                 continue;
             }
             const score = this.calculateSimilarity(user.tasteVector,content.featureVector);
-            recommendations.push({ content, score });
+            const explanation = this.getExplanation(user.tasteVector, content.featureVector);  
+            recommendations.push({ content, score, explanation });  
         }
         recommendations.sort((a, b) => b.score - a.score);
 
         return recommendations.slice(0, limit);
+    }
+
+    getExplanation(userVector,contentVector){
+        if (!Array.isArray(userVector)||!Array.isArray(contentVector)||userVector.length!==contentVector.length){
+            return "";
+        }
+
+        const contributions = [];
+        for (let i = 0; i < userVector.length; i++) { //calculate contribution and map to dimension
+            const contribution = userVector[i] * contentVector[i];
+            contributions.push({dimension: DIMENSION_LABELS[i],
+                                contribution});
+        }
+
+        //sort top 3 contribution
+        contributions.sort((a, b) => b.contribution - a.contribution);
+        const topDimensions = contributions
+                            .filter(item => item.contribution > 0)
+                            .slice(0, 3)
+                            .map(item => item.dimension);
+
+        return topDimensions.join(", "); //return as string
+    
     }
 }
 

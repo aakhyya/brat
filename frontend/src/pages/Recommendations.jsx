@@ -64,7 +64,7 @@ function Recommendations() {
 
             {!loading && !error && recommendations.length > 0 && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                    {recommendations.map(({ content, score }) => {
+                    {recommendations.map(({ content, score, explanation }) => {
                         const safeScore = Math.max(0, score);
                         const percentage = (safeScore * 100).toFixed(0);
 
@@ -89,7 +89,7 @@ function Recommendations() {
                     text-black text-xs font-bold
                     ${getScoreColor(score)}
                   `}
-                                    title="based on your taste profile"
+                                    title={explanation}
                                 >
                                     {percentage}% match
                                 </div>
@@ -131,6 +131,9 @@ function Recommendations() {
                                                 {content.creators?.map(c => typeof c === 'string' ? c : c.name).join(", ")}
                                             </p>
                                         )}
+
+                                        
+
                                     </div>
 
                                     <div className="mt-auto">
