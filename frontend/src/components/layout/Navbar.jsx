@@ -12,7 +12,8 @@ function Navbar() {
     if (!open) return;
     
     const handleClickOutside = (e) => {
-      if (!e.target.closest('.user-menu')) {  // Add class to menu container
+      if (!e.target.closest('.user-menu')) { //Are you, or is any of your ancestors up the DOM family tree,
+                                            //wearing the badge .user-menu?
         setOpen(false);
       }
     };

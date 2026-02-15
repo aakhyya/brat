@@ -52,22 +52,20 @@ function Dashboard() {
                         {/* Avatar */}
                         <div className="flex justify-between">
                             <div
-                                className="
-                w-20
-                h-20
-                bg-black
-                border-r-4
-                border-neon-green
-                text-neon-green
-                rounded-full
-                flex
-                items-center
-                justify-center
-                text-4xl
-              "
-                            >
-                                ☠︎︎
-                            </div>
+  className="
+    w-20
+    h-20
+    rounded-full
+    overflow-hidden
+  "
+>
+  <img
+    src="/1.jpg"
+    alt="User Avatar"
+    className="w-full h-full object-cover"
+  />
+</div>
+
                             <div className="pl-5">
                                 <h2
                                     className="
@@ -78,7 +76,7 @@ function Dashboard() {
                   
                 "
                                 >
-                                    Welcome {user?.profile?.displayName} ᝰ🚬
+                                    Welcome {user?.profile?.displayName}ᝰ🚬
                                 </h2>
                                 <p className="text-chrome-silver text-lg">
                                     prove you're not tasteless

@@ -125,12 +125,17 @@ function Recommendations() {
                                         >
                                             {content.title}
                                         </h3>
+                                        {explanation && (
+                                            <p className="text-sm italic text-chrome-silver">
+                                                {explanation}
+                                            </p>
+                                        )}
 
-                                        {content.creators?.length > 0 && (
+                                        {/* {content.creators?.length > 0 && (
                                             <p className="text-sm text-chrome-silver mb-4">
                                                 {content.creators?.map(c => typeof c === 'string' ? c : c.name).join(", ")}
                                             </p>
-                                        )}
+                                        )} */}
 
                                         
 
