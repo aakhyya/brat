@@ -3,7 +3,7 @@ const router = express.Router();
 
 const {
     createContent,getAllContent,getContentById,updateContent,deleteContent,searchContent,
-    getUserLibrary,rateContent,toggleFavorite,deleteInteraction,getRecommendations,
+    getUserLibrary,rateContent,toggleFavorite,deleteInteraction,getRecommendations,getCrossMediaRecommendations,
     searchMovies,enrichMovie,searchSongs,enrichSong,searchBooks,enrichBook
 } = require("../controllers/contentController");
 const { protect } = require("../middlewares/auth");
@@ -12,7 +12,9 @@ router.get("/", getAllContent);
 router.get("/search", searchContent); 
 router.get("/library",protect, getUserLibrary);
 router.get("/recommendations", protect, getRecommendations);
+router.get("/:contentId/cross-media", protect, getCrossMediaRecommendations);
 router.get("/:id", getContentById);
+
 
 // Protected routes
 router.post("/:contentId/rate", protect, rateContent);

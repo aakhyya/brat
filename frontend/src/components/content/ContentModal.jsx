@@ -107,6 +107,7 @@ function ContentModal({
               {interaction?.isFavorite ? "remove from favourites" : "add to favorites"}
             </button>
 
+
             {/* Delete */}
             <div className="mt-8">
               <button

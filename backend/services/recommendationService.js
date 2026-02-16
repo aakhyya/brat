@@ -70,6 +70,9 @@ class RecommendationService{
                 continue;
             }
             const score = this.calculateSimilarity(user.tasteVector,content.featureVector);
+            if (score <= 0) {
+                continue; 
+            }
             const explanation = this.getExplanation(user.tasteVector, content.featureVector);  
             recommendations.push({ content, score, explanation });  
         }

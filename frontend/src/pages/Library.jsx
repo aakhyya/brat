@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { contentApi } from "../services/contentApi";
 import StarRating from "../components/ui/StarRating";
 import ContentModal from "../components/content/ContentModal";
-
-
+import CrossMediaSection from "../components/content/CrossMediaSection";
 
 function Library() {
     const [library, setLibrary] = useState([]);
@@ -12,6 +11,7 @@ function Library() {
     const [page, setPage] = useState(1);
     const [selectedItem, setSelectedItem] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedForCrossMedia, setSelectedForCrossMedia] = useState(null);
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -147,17 +147,36 @@ function Library() {
                                 hover:border-green-400/60 transition-all
                             "
                             >
-
-                                <h3 className="text-lg font-bold  text-neon-green">
-                                    {item.isFavorite && (
-                                        <span className="text-pink-400 mr-2">
-                                            ★
-                                        </span>
-                                    )}
-                                    {item.content.title}
-                                </h3>
-
-                                <p className="text-gray-200 text-md">
+                                <div className="flex justify-between">
+                                    <div>
+                                    <h3 className="text-lg font-bold  text-neon-green">
+                                        {item.isFavorite && (
+                                            <span className="text-pink-400 mr-2">
+                                                ★
+                                            </span>
+                                        )}
+                                        {item.content.title}
+                                    </h3>
+                                    </div>
+                                    <div>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // prevent modal from opening
+                                            setSelectedForCrossMedia(item.content);
+                                        }}
+                                        className="
+                                            px-3 py-2 rounded-md
+                                            text-sm font-bold border border-pink-300
+                                            text-chrome-silver
+                                            hover:shadow-[0_0_20px_rgba(168,85,247,0.6)]
+                                            transition-all duration-300
+                                        "
+                                    >
+                                        🔗 similar content
+                                    </button>
+                                    </div>
+                                </div>
+                                <p className="text-gray-200 mb-1 text-md">
                                     {item.content.type}
                                 </p>
 
@@ -180,8 +199,6 @@ function Library() {
                                         }
                                     }}
                                 />
-
-
 
                             </div>
                         ))}
@@ -256,8 +273,38 @@ function Library() {
                     ▶
                 </button>
             </div>
+            {/* Cross-Media Modal */}
+            {selectedForCrossMedia && (
+                <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
+                    <div className="bg-black border-2 border-green-400 rounded-lg p-6 max-w-6xl w-full max-h-[90vh] overflow-y-auto relative shadow-[0_0_40px_rgba(34,197,94,0.5)]">
 
+                        {/* Close button */}
+                        <button
+                            onClick={() => setSelectedForCrossMedia(null)}
+                            className="absolute top-4 right-4
+            text-3xl text-red-400
+            hover:text-red-600 hover:scale-150
+            transition-all duration-300"
+                        >
+                            ✘
+                        </button>
 
+                        {/* Header */}
+                        <h2 className="text-3xl text-white  mb-2">
+                            <span className=" text-neon-green italic font-semibold">
+                                {selectedForCrossMedia.title}
+                            </span> coded
+                        </h2>
+
+                        <p className="text-gray-400 mb-6">
+                            
+                        </p>
+
+                        {/* Cross-media section */}
+                        <CrossMediaSection sourceContent={selectedForCrossMedia} />
+                    </div>
+                </div>
+            )}
 
         </div>
     );

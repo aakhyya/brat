@@ -5,6 +5,7 @@ const Interaction = require("../models/interaction");
 const featureExtractor = require("../services/featureExtractor");
 const tasteVectorService = require("../services/tasteVectorService");
 const recommendationService = require("../services/recommendationService");
+const crossMediaService = require("../services/crossMediaService");
 const tmdbService = require('../services/tmdbService');
 const itunesService = require('../services/itunesService');
 const googleBooksService = require('../services/googleBooksService');
@@ -559,6 +560,66 @@ async function getRecommendations(req, res) {
     }
 }
 
+async function getCrossMediaRecommendations(req, res) {
+    try {
+        const { contentId } = req.params;
+        const { targetType } = req.query;
+
+        // Validate contentId
+        if (!mongoose.Types.ObjectId.isValid(contentId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid content ID"
+            });
+        }
+
+        // Validate targetType
+        if (!targetType || !['movie', 'song', 'book'].includes(targetType)) {
+            return res.status(400).json({
+                success: false,
+                message: "Valid targetType required (movie, song, or book)"
+            });
+        }
+
+        // Get source content
+        const sourceContent = await Content.findById(contentId);
+        if (!sourceContent) {
+            return res.status(404).json({
+                success: false,
+                message: "Content not found"
+            });
+        }
+
+        // Get all content with feature vectors
+        const allContent = await Content.find({
+            featureVector: { $exists: true, $ne: [] }
+        }).lean();
+
+        // Find cross-media matches
+        const matches = await crossMediaService.findCrossMediaMatches(
+            sourceContent,
+            allContent,
+            targetType,
+            10
+        );
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                sourceContent,
+                matches
+            }
+        });
+    } catch (err) {
+        console.error('Cross-media recommendation error:', err);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to generate cross-media recommendations"
+        });
+    }
+}
+
+
 //TMDB: Movies
 async function searchMovies(req, res) {
     try {
@@ -770,6 +831,6 @@ async function enrichBook(req, res) {
 
 module.exports = {
     createContent, getAllContent, getContentById, updateContent, deleteContent, searchContent,
-    getUserLibrary, rateContent, toggleFavorite, deleteInteraction,getRecommendations,
+    getUserLibrary, rateContent, toggleFavorite, deleteInteraction,getRecommendations,getCrossMediaRecommendations,
     searchMovies, enrichMovie, searchSongs, enrichSong, searchBooks, enrichBook
 };
