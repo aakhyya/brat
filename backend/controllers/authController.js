@@ -1,33 +1,33 @@
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 
-async function signup (req, res){
+async function signup(req, res) {
   try {
     const { email, password, displayName } = req.body;
-        if (!email || !password || !displayName) {
+    if (!email || !password || !displayName) {
       return res.status(400).json({
         success: false,
         message: 'All credentials required!',
       });
     }
 
-    const existingUser=await User.findOne({email});
-    if(existingUser){
-        return res.status(400).json({
-            success: false,
-            message: 'Email already exists',
-        });
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email already exists',
+      });
     }
-    
-    const user=await User.create({
-        email,
-        password,
-        profile:{
-            displayName,
-        },
+
+    const user = await User.create({
+      email,
+      password,
+      profile: {
+        displayName,
+      },
     });
-    const token=user.generateAuthToken();
-    
+    const token = user.generateAuthToken();
+
     res.status(201).json({
       success: true,
       message: 'User signed up successfully',
@@ -41,10 +41,10 @@ async function signup (req, res){
         token,
       },
     });
-    
+
   } catch (error) {
     console.error('Signup error:', error);
-    
+
     //duplicate email error
     if (error.code === 11000) {
       return res.status(400).json({
@@ -52,7 +52,7 @@ async function signup (req, res){
         message: 'Email already exists',
       });
     }
-    
+
     res.status(500).json({
       success: false,
       message: 'Server error during Signup',
@@ -62,25 +62,25 @@ async function signup (req, res){
 };
 
 // POST /api/auth/login
-async function login(req, res){
+async function login(req, res) {
   try {
     const { email, password } = req.body;
-    if(!email || !password){
-        return res.status(400).json({
-            success:false,
-            message:'All credentials are required!'
-        });
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'All credentials are required!'
+      });
     }
-    
-    const user=await User.findOne({email}).select('+password'); //including password explicitly
-     if (!user) {
+
+    const user = await User.findOne({ email }).select('+password'); //including password explicitly
+    if (!user) {
       return res.status(401).json({
         success: false,
         message: 'Invalid email or password',
       });
     }
-    
-    const isMatch=await user.comparePassword(password);
+
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({
         success: false,
@@ -88,8 +88,8 @@ async function login(req, res){
       });
     }
 
-    const token= user.generateAuthToken();
-    
+    const token = user.generateAuthToken();
+
     res.json({
       success: true,
       message: 'Login successful',
@@ -103,7 +103,7 @@ async function login(req, res){
         token,
       },
     });
-    
+
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({
@@ -124,12 +124,12 @@ async function getMe(req, res) {
         message: 'User not found',
       });
     }
-    
+
     res.json({
       success: true,
       data: { user },
     });
-    
+
   } catch (error) {
     console.error('Get profile error:', error);
     res.status(500).json({
@@ -202,12 +202,12 @@ async function getTasteProfile(req, res) {
       .slice(0, 5);
 
     res.status(200).json({
-  success: true,
-  data: {
-    strongPreferences,
-    weakPreferences
-  }
-});
+      success: true,
+      data: {
+        strongPreferences,
+        weakPreferences
+      }
+    });
 
   } catch (error) {
     console.error("Taste profile error:", error);
@@ -218,4 +218,95 @@ async function getTasteProfile(req, res) {
   }
 }
 
-module.exports={signup,login,getMe,getTasteProfile};
+async function getTasteGraphData(req, res) {
+  try{
+    const userId=req.user._id;
+    const user=await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    const vector=user.tasteVector;
+    if (!vector || vector.length !== 30) {
+      return res.status(200).json({
+        success: true,
+        message: "No taste data yet. Rate some content!",
+        data: {
+          nodes: [],
+          edges: []
+        }
+      });
+    }
+
+    const categories = {
+      genre: { start: 0, end: 9, color: "#a855f7" }, // purple
+      mood: { start: 10, end: 15, color: "#22c55e" }, // green
+      theme: { start: 16, end: 21, color: "#06b6d4" }, // cyan
+      era: { start: 22, end: 25, color: "#ec4899" }, // pink
+      complexity: { start: 26, end: 29, color: "#f59e0b" } // amber
+    };
+
+    const nodes = [];
+    for (let i = 0; i < vector.length; i++) { //making nodes
+      const value = vector[i];
+      let category = "other";
+      let color = "#6b7280"; //gray default
+      
+      for (const [catName, catInfo] of Object.entries(categories)) {
+        if (i >= catInfo.start && i <= catInfo.end) {
+          category = catName;
+          color = catInfo.color;
+          break;
+        }
+      }
+
+      nodes.push({
+        id:i,
+        label:DIMENSION_LABELS[i],
+        value:value,
+        category: category,
+        color: color, //Colors = categories
+      });
+    }
+
+     // Create edges between related nodes
+    const edges = [];
+    const threshold = 0.3; // only meaningful connections
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const node1 = nodes[i];
+        const node2 = nodes[j];
+        const similarity = Math.abs(node1.value * node2.value);
+
+        if (similarity > threshold) {
+          edges.push({
+            source: i, //Connect node i to node j
+            target: j,
+            strength: similarity //Thickness / opacity can be based on strength
+          });
+        }
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        nodes: nodes,// taste dimensions
+        edges: edges //strong co-preferences
+      }
+    });
+
+  }
+  catch(err){
+    console.error("Taste graph error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch taste graph"
+    });
+  }
+}
+
+module.exports = { signup, login, getMe, getTasteProfile, getTasteGraphData };

@@ -47,7 +47,7 @@ export default function TasteProfile() {
   }
 
   function renderBar(item, isStrong) {
-    const width = Math.min(Math.abs(item.value) * 100, 100);
+    const width = isStrong ? Math.min(Math.abs(item.value) * 100, 100): 100;
 
     const glowClass = isStrong
       ? "border-neon-green"
@@ -64,7 +64,7 @@ export default function TasteProfile() {
       >
         <div className="flex justify-between mb-3 text-sm tracking-wider">
           <span className="opacity-90 font-serif italic">{item.dimension}</span>
-          <span className="text-md font-semibold font-mono">{item.value.toFixed(2)}</span>
+          <span className="text-md font-semibold font-serif">{isStrong? item.value.toFixed(2) * 100: 100}%</span>
         </div>
 
         <div className="w-full bg-black/50 border border-chrome-silver rounded-full h-4 overflow-hidden">

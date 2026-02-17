@@ -1,4 +1,3 @@
-const Content = require("../models/content");
 
 const DIMENSION_LABELS = [
     // 0–9 Genres
