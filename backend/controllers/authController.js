@@ -230,6 +230,8 @@ async function getTasteGraphData(req, res) {
     }
 
     const vector=user.tasteVector;
+    console.log("User taste vector:", vector);
+    console.log("Max value:", Math.max(...vector.map(v => Math.abs(v))));
     if (!vector || vector.length !== 30) {
       return res.status(200).json({
         success: true,
@@ -242,11 +244,11 @@ async function getTasteGraphData(req, res) {
     }
 
     const categories = {
-      genre: { start: 0, end: 9, color: "#a855f7" }, // purple
-      mood: { start: 10, end: 15, color: "#22c55e" }, // green
-      theme: { start: 16, end: 21, color: "#06b6d4" }, // cyan
-      era: { start: 22, end: 25, color: "#ec4899" }, // pink
-      complexity: { start: 26, end: 29, color: "#f59e0b" } // amber
+      genre: { start: 0, end: 9, color: "#d8b4fe" }, // purple
+      mood: { start: 10, end: 15, color: "#86efac" }, // green
+      theme: { start: 16, end: 21, color: "#67e8f9" }, // cyan
+      era: { start: 22, end: 25, color: "#f9a8d4" }, // pink
+      complexity: { start: 26, end: 29, color: "#fcd34d" } // amber
     };
 
     const nodes = [];
@@ -274,18 +276,18 @@ async function getTasteGraphData(req, res) {
 
      // Create edges between related nodes
     const edges = [];
-    const threshold = 0.3; // only meaningful connections
+    const threshold = 0.04; // only meaningful connections
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
         const node1 = nodes[i];
         const node2 = nodes[j];
-        const similarity = Math.abs(node1.value * node2.value);
-
-        if (similarity > threshold) {
+         // Connect if both values are above threshold
+        if (Math.abs(node1.value) > threshold && Math.abs(node2.value) > threshold) {
+          const avgStrength = (Math.abs(node1.value) + Math.abs(node2.value)) / 2;
           edges.push({
-            source: i, //Connect node i to node j
+            source: i,
             target: j,
-            strength: similarity //Thickness / opacity can be based on strength
+            strength: avgStrength
           });
         }
       }

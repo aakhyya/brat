@@ -10,6 +10,7 @@ function TasteGraphVisualization({ data }) { //data -> nodes and edges
         }
 
         d3.select(svgRef.current).selectAll("*").remove(); //removes old graph b4 new one
+
         const width = 800;
         const height = 600;
 
@@ -18,13 +19,14 @@ function TasteGraphVisualization({ data }) { //data -> nodes and edges
             .attr("width", width) //set width, height and viewbox for responsiveness
             .attr("heigth", height)
             .attr("viewBox", [0, 0, width, height]);//All drawings are inside a 0 → width and 0 → height universe
+
         const g = svg.append("g"); //groups elements together for zooming, pan, transform
+
         const zoom = d3.zoom()
             .scaleExtent([0.5, 3]) //Min/max zoom levels
             .on("zoom", (event) => {
                 g.attr("transform", event.transform); //On zoom, transforms the <g> container
             });
-
         svg.call(zoom); //Enables zoom on SVG
 
         const simulation = d3
@@ -37,12 +39,13 @@ function TasteGraphVisualization({ data }) { //data -> nodes and edges
             .force("center", d3.forceCenter(width / 2, height / 2)) //Pulls all nodes toward center of screen
             .force("collision", d3.forceCollide() //Prevents nodes from overlapping
                 .radius(30)); // keeps min. radius of 30px
+
         const link = g //Creates <line> elements for each edge
             .append("g") //creating another invisible folder inside me g element
             .selectAll("line") //selecting all lines
             .data(data.edges) //each edge obj has it's own line element
             .join("line") // 40 edges → 40 SVG lines.
-            .attr("stroke", "#4ade80") //green line
+            .attr("stroke", "#FFFFFF") //green line
             .attr("stroke-opacity", 0.3) //transparent 
             .attr("stroke-width", d => d.strength * 3); //width depends on similarity
 
@@ -52,9 +55,7 @@ function TasteGraphVisualization({ data }) { //data -> nodes and edges
             .data(data.nodes)
             .join("circle")
             .attr("r", d => 10 + d.value * 20) //bigger radius -> stronger preference
-            .attr("fill", d => d.color) //fill node w category color
-            .attr("stroke", "#fff") //white border
-            .attr("stroke-width", 2)
+            .attr("fill", d=>d.color)
             .style("cursor", "pointer")
             .call(drag(simulation));//Click a node, Move it, Physics adjusts around it
 
@@ -65,12 +66,12 @@ function TasteGraphVisualization({ data }) { //data -> nodes and edges
             .join("text")
             .text(d => d.label)
             .attr("font-size", 10)
-            .attr("fill", "#fff") //white text
+            .attr("fill", d => d.color) //white text
             .attr("text-anchor", "middle") //Centers the text horizontally relative to its x position
             .attr("dy", -20) //moves the label 20px upward
             .style("pointer-events", "none"); //ignore mouse events
 
-        node
+        node //hover functions
             .on("mouseover", function (event, d) { // node grows (+5 radius) and glows
                 d3.select(this)
                     .transition()
@@ -101,20 +102,24 @@ function TasteGraphVisualization({ data }) { //data -> nodes and edges
         });
 
         function drag(simulation) {
-            function dragstarted(event) {
+            function dragstarted(event) { //when you click a node
+                //alpha = simulation energy (gives energy to restart)
                 if (!event.active) simulation.alphaTarget(0.3).restart();
-                event.subject.fx = event.subject.x;
+                // temporarily pins the node so physics stops moving it randomly
+                event.subject.fx = event.subject.x; //fx = fixed x
                 event.subject.fy = event.subject.y;
             }
 
-            function dragged(event) {
-                event.subject.fx = event.x;
+            function dragged(event) { //while moving mouse
+                //node's fixed position follows the cursor
+                event.subject.fx = event.x; 
                 event.subject.fy = event.y;
             }
 
-            function dragended(event) {
-                if (!event.active) simulation.alphaTarget(0);
-                event.subject.fx = null;
+            function dragended(event) { //release the mouse
+                if (!event.active) simulation.alphaTarget(0); // let the system calm down again
+                //physics takes control again
+                event.subject.fx = null; 
                 event.subject.fy = null;
             }
 
@@ -125,13 +130,13 @@ function TasteGraphVisualization({ data }) { //data -> nodes and edges
         }
 
         return () => { //cleanup
-            simulation.stop();
+            simulation.stop(); //stops simulation when component unmounts
         };
 
     },[data]);
 
     return (
-    <div className="w-full h-full bg-black rounded-lg border-2 border-green-400/30 overflow-hidden">
+    <div className="w-full h-full bg-black rounded-lg border-2 border-neon-green overflow-hidden">
       <svg ref={svgRef} className="w-full h-full"></svg>
     </div>
   );
