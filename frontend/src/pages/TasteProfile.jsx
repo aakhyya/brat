@@ -6,29 +6,61 @@ function TasteProfile() {
   const [graphData, setGraphData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  //Polling
+  const [lastUpdated, setLastUpdated] = useState(null);
 
-
-  async function fetchGraphData() {
-    setLoading(true);
+  async function fetchGraphData(isManualRefresh=false) {
+    if (isManualRefresh) {
+      setLoading(true); //load only if manual refresh
+    }
     setError(null);
     try {
       const res = await api.get("/api/auth/taste-graph");
       setGraphData(res.data.data);
+      setLastUpdated(new Date()); //track last updated
     }
     catch (err) {
       console.error("Failed to fetch taste graph", err);
       setError("Failed to load taste graph. Try again later.");
     }
     finally {
-      setLoading(false);
+      setLoading(false);  
     }
   }
 
   useEffect(() => {
-    fetchGraphData();
+    fetchGraphData()
   }, []);
 
-  if (loading) {
+  //Polling
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      fetchGraphData();
+    }, 60000);// fetch every 30 sec
+
+    return (() => {
+      clearInterval(intervalId);
+    });
+  }, []);
+
+  function formatLastUpdated() { //format timestamp
+    if (!lastUpdated) return "";
+    const now = new Date();
+    const diff = Math.floor((now - lastUpdated) / 1000);
+
+    if (diff < 60) {
+      return `${diff}s ago`; // seconds
+    }
+    else if (diff < 3600) {
+      return `${Math.floor(diff / 60)}m ago`; // minutes
+    }
+    else { //for 1 hour+
+      return lastUpdated.toLocaleTimeString(); //3:42 PM
+    }
+  }
+
+
+  if (loading && !graphData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
         <div className="text-center">
@@ -43,7 +75,7 @@ function TasteProfile() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
         <div className="text-center">
-          <p className="text-red-400 text-xl mb-4">{error}</p>
+          <p className="text-red-400 text-xl mb-4">🚨 {error}</p>
           <button
             onClick={fetchGraphData}
             className="px-6 py-2 bg-green-400 text-black font-bold rounded-lg hover:bg-green-500 transition"
@@ -92,15 +124,27 @@ function TasteProfile() {
                                 text-chrome">
             Your Taste Graph
           </h1>
-          <button
-            onClick={fetchGraphData}
-            className="px-4 py-2 border border-neon-green text-chrome-silver font-bold rounded-lg hover:text-neon-green transition"
-          >
-            ⟳ Refresh
-          </button>
+          <div className="flex items-center gap-4">
+            {/* Last Updated Timestamp */}
+            {lastUpdated && (
+              <div className="text-pink-200 text-sm font-mono">
+                Updated {formatLastUpdated()}
+              </div>
+            )}
+
+            {/* Manual Refresh Button */}
+            <button
+              onClick={() => fetchGraphData(true)}
+              disabled={loading}
+              className="px-4 py-2 border border-neon-green text-chrome-silver font-bold rounded-lg hover:text-neon-green transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? "Refreshing..." : "⟳ Refresh"}
+            </button>
+          </div>
+
         </div>
         <p className="text-pink-200 mt-2">
-          𓏲ּ𝄢 your vibe, visualised 
+          𓏲ּ𝄢 your vibe, visualised
         </p>
       </div>
 
@@ -166,14 +210,14 @@ function TasteProfile() {
                   <span className="text-xl text-green-400"> {(strongestPreference.value * 100).toFixed(0)}%</span></p>
                 <p className="text-sm font-bold text-green-400">
                   {strongestPreference.label}
-                </p>  
+                </p>
               </div>
               <div>
-                <p className="text-md text-chrome-silver">⌖ Weakest: 
+                <p className="text-md text-chrome-silver">⌖ Weakest:
                   <span className="text-xl text-red-400"> {(weakestPreference.value * 100).toFixed(0)}%</span></p>
                 <p className="text-sm font-bold text-red-400">
                   {weakestPreference.label}
-                </p>  
+                </p>
               </div>
             </div>
           </div>

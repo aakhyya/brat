@@ -68,7 +68,7 @@ function CrossMediaSection({ sourceContent }) {
         </p>
       ) : matches.length === 0 ? (
         <p className="text-center text-gray-400">
-          No similar {selectedType}s found
+          No similar {selectedType}s found 𓇢𓆸
         </p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

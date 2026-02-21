@@ -48,7 +48,7 @@ function Recommendations() {
             )}
 
             {error && (
-                <p className="text-center text-red-400">{error}</p>
+                <p className="text-center text-red-400">🚨 {error}</p>
             )}
 
             {!loading && !error && recommendations.length === 0 && (

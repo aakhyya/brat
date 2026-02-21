@@ -121,7 +121,7 @@ function Library() {
                 {/* Empty State */}
                 {!loading && library.length === 0 && (
                     <div className="text-center text-purple-300 mt-20">
-                        <p className="text-xl mb-4">you're giving tasteless❗</p>
+                        <p className="text-xl mb-4">you're giving tasteless 𓇢𓆸</p>
                         <a
                             href="/search"
                             className="text-green-400 underline hover:text-green-300 no-underline"

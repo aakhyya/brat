@@ -207,7 +207,7 @@ function ContentSearch() {
                     results.length === 0 &&
                     searchQuery.trim().length >= 2 && (
                         <p className="col-span-full text-center text-purple-400">
-                            No results found. Try a different search term.
+                            No results found. Try a different search term 𓇢𓆸
                         </p>
                     )}
 

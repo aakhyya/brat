@@ -49,13 +49,13 @@ function Home() {
         </h1>
         <div className="mt-6 flex justify-center gap-8 text-md tracking-wider text-neon-green">
           <div>
-            {loadingStats ? "..." : `💿 ${stats?.songs || 0} songs`}
+            {loadingStats ? "..." : `💿 ${stats?.songs || 0} ${(stats?.songs) <=1 ? `song` : `songs`}`}
           </div>
           <div>
-            {loadingStats ? "..." : `🎞️ ${stats?.movies || 0} movies`}
+            {loadingStats ? "..." : `🎞️ ${stats?.movies || 0} ${(stats?.movies) <=1 ? `movie` : `movies`}`}
           </div>
           <div>
-            {loadingStats ? "..." : `📖 ${stats?.books || 0} books`}
+            {loadingStats ? "..." : `📖 ${stats?.books || 0} ${(stats?.books) <=1 ? `book` : `books`}`}
           </div>
         </div>
 
@@ -71,10 +71,10 @@ function Home() {
             path: "/search",
           },
           {
-            icon: ".✦ ݁˖",
-            title: "explore",
-            desc:"something",
-              path: "/search",
+            icon: "🀥",
+            title: "your content",
+            desc:"content you heavily fw", 
+              path: "/library",
           },
         {
           icon: "🔗",

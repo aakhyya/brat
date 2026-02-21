@@ -35,6 +35,10 @@ function Navbar() {
     navigate("/login");
   }
 
+  function handleProfile(){
+    navigate("/taste-graph");
+  }
+
   return (
     <nav
       className="
@@ -114,26 +118,16 @@ function Navbar() {
               "
             >
               <button
+                onClick={handleProfile}
                 className="
                   w-full text-left px-4 py-2
-                  text-purple-400 hover:text-green-400
+                  text-green-400 hover:text-purple-400
                   hover:bg-green-400/10
                 "
-                disabled
               >
                 Profile
               </button>
 
-              <button
-                className="
-                  w-full text-left px-4 py-2
-                  text-purple-400 hover:text-green-400
-                  hover:bg-green-400/10
-                "
-                disabled
-              >
-                Settings
-              </button>
 
               <button
                 onClick={handleLogout}

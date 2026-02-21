@@ -110,7 +110,7 @@ function ResultCard({ item, type, onAdd }) {
 
                 {error && (
                     <p className="text-xs text-acid-pink mt-1">
-                        {error}
+                        🚨 {error}
                     </p>
                 )}
             </div>
