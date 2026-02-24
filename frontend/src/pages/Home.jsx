@@ -72,9 +72,9 @@ function Home() {
           },
           {
             icon: "🀥",
-            title: "your content",
-            desc:"content you heavily fw", 
-              path: "/library",
+            title: "discover by vibe",
+            desc:"fine-tune and explore content", 
+              path: "/dimension-search",
           },
         {
           icon: "🔗",

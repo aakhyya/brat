@@ -124,7 +124,7 @@ function Library() {
                         <p className="text-xl mb-4">you're giving tasteless 𓇢𓆸</p>
                         <a
                             href="/search"
-                            className="text-green-400 underline hover:text-green-300 no-underline"
+                            className="text-green-400 underline hover:text-green-300"
                         >
                             go discover content ᯓ➤
                         </a>

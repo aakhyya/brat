@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const {
-    createContent,getAllContent,getContentById,updateContent,deleteContent,searchContent,
+    createContent,getAllContent,getContentById,updateContent,deleteContent,searchContent,searchByMood,getDimensions,
     getUserLibrary,rateContent,toggleFavorite,deleteInteraction,getRecommendations,getCrossMediaRecommendations,
     searchMovies,enrichMovie,searchSongs,enrichSong,searchBooks,enrichBook
 } = require("../controllers/contentController");
@@ -12,6 +12,9 @@ router.get("/", getAllContent);
 router.get("/search", searchContent); 
 router.get("/library",protect, getUserLibrary);
 router.get("/recommendations", protect, getRecommendations);
+// Mood-based search
+router.post('/mood-search', protect, searchByMood);
+router.get('/dimensions', getDimensions);
 router.get("/:contentId/cross-media", protect, getCrossMediaRecommendations);
 router.get("/:id", getContentById);
 
@@ -33,6 +36,7 @@ router.get('/enrich/book/search', protect, searchBooks);
 router.post('/enrich/movie/:tmdbId', protect, enrichMovie);
 router.post('/enrich/song/:itunesId', protect, enrichSong);
 router.post('/enrich/book/:googleBooksId', protect, enrichBook);
+
 
 module.exports = router;
 

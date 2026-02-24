@@ -43,7 +43,6 @@ async function signup(req, res) {
     });
 
   } catch (error) {
-    console.error('Signup error:', error);
 
     //duplicate email error
     if (error.code === 11000) {
@@ -105,7 +104,6 @@ async function login(req, res) {
     });
 
   } catch (error) {
-    console.error('Login error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error during login',
@@ -131,7 +129,6 @@ async function getMe(req, res) {
     });
 
   } catch (error) {
-    console.error('Get profile error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error',
@@ -210,7 +207,6 @@ async function getTasteProfile(req, res) {
     });
 
   } catch (error) {
-    console.error("Taste profile error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch taste profile"
@@ -230,8 +226,6 @@ async function getTasteGraphData(req, res) {
     }
 
     const vector=user.tasteVector;
-    console.log("User taste vector:", vector);
-    console.log("Max value:", Math.max(...vector.map(v => Math.abs(v))));
     if (!vector || vector.length !== 30) {
       return res.status(200).json({
         success: true,
@@ -303,7 +297,6 @@ async function getTasteGraphData(req, res) {
 
   }
   catch(err){
-    console.error("Taste graph error:", err);
     res.status(500).json({
       success: false,
       message: "Failed to fetch taste graph"

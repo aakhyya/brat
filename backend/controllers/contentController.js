@@ -6,6 +6,7 @@ const featureExtractor = require("../services/featureExtractor");
 const tasteVectorService = require("../services/tasteVectorService");
 const recommendationService = require("../services/recommendationService");
 const crossMediaService = require("../services/crossMediaService");
+const moodSearchService=require("../services/moodSearchService");
 const tmdbService = require('../services/tmdbService');
 const itunesService = require('../services/itunesService');
 const googleBooksService = require('../services/googleBooksService');
@@ -619,6 +620,70 @@ async function getCrossMediaRecommendations(req, res) {
     }
 }
 
+//Search based on mood(or any dimension)
+async function searchByMood(req,res) {
+    try{
+        const { dimensions, mediaTypes, limit = 20 } = req.body;
+        if (!dimensions || typeof dimensions !== 'object' || Object.keys(dimensions).length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Dimensions query is required and must be an object'
+            });
+        }
+        for (const [key, value] of Object.entries(dimensions)) {
+            if (typeof value !== 'number' || value < 0 || value > 1) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Invalid dimension value for ${key}. Must be between 0 and 1`
+                });
+            }
+        }
+        if (mediaTypes && !Array.isArray(mediaTypes)) {
+            return res.status(400).json({
+                success: false,
+                message: 'mediaTypes must be an array'
+            });
+        }
+
+        const results = await moodSearchService.searchByDimensions(
+            dimensions,
+            mediaTypes,
+            Number(limit)
+        );
+
+        return res.status(200).json({
+            success: true,
+            count: results.length,
+            data: results
+        });
+    }
+    catch(err){
+        console.error('Dimension search error:', err);
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to search by dimensions',
+            error: err.message
+        });
+    }
+}
+
+async function getDimensions(req, res) {
+  try {
+    const dimensions = moodSearchService.getAllDimensions();
+    
+    return res.status(200).json({
+      success: true,
+      data: dimensions
+    });
+  } catch (err) {
+    console.error('Get dimensions error:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch dimensions'
+    });
+  }
+}
+
 
 //TMDB: Movies
 async function searchMovies(req, res) {
@@ -830,7 +895,7 @@ async function enrichBook(req, res) {
 
 
 module.exports = {
-    createContent, getAllContent, getContentById, updateContent, deleteContent, searchContent,
+    createContent, getAllContent, getContentById, updateContent, deleteContent, searchContent,searchByMood,getDimensions,
     getUserLibrary, rateContent, toggleFavorite, deleteInteraction,getRecommendations,getCrossMediaRecommendations,
     searchMovies, enrichMovie, searchSongs, enrichSong, searchBooks, enrichBook
 };

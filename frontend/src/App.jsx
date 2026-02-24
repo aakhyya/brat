@@ -9,6 +9,7 @@ import Layout from "./components/layout/Layout";
 import Dashboard from "./pages/Dashboard";
 import TasteProfile from "./pages/TasteProfile";
 import Recommendations from "./pages/Recommendations";
+import DimensionSearch from './pages/DimensionSearch';
 
 function App() {
   return (
@@ -47,6 +48,12 @@ function App() {
       <Route path="/recommendations" element={
         <ProtectedRoute>
           <Layout><Recommendations /></Layout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/dimension-search" element={
+        <ProtectedRoute>
+          <Layout><DimensionSearch/></Layout>
         </ProtectedRoute>
       } />
     </Routes>

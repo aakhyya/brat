@@ -96,7 +96,7 @@ function Signup(){
           {localError && <Alert type="error" message={localError} />}
           {error && <Alert type="error" message={error} />}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
             <Input
               label="Display Name"
               type="text"

@@ -88,7 +88,7 @@ function Login() {
                         <Alert type="error" message={error} />
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
                         <Input
                             label="Email"
                             type="email"
