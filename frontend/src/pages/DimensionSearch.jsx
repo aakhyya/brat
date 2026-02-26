@@ -94,10 +94,10 @@ function DimensionSearch() {
 
     if (loadingDimensions) {
         return (
-            <div className="min-h-screen bg-black text-white flex items-center justify-center">
+            <div className="min-h-screen bg-black text-white flex items-center justify-center px-4">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-green-400 mx-auto mb-4"></div>
-                    <p className="text-lg">Loading dimensions...</p>
+                    <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-t-2 border-b-2 border-green-400 mx-auto mb-4"></div>
+                    <p className="text-base sm:text-lg">Loading dimensions...</p>
                 </div>
             </div>
         );
@@ -105,12 +105,12 @@ function DimensionSearch() {
 
     if (!dimensionCategories) {
         return (
-            <div className="min-h-screen bg-black text-white flex items-center justify-center">
+            <div className="min-h-screen bg-black text-white flex items-center justify-center px-4">
                 <div className="text-center">
-                    <p className="text-red-400 text-xl mb-4">Failed to load dimensions 𓇢𓆸</p>
+                    <p className="text-red-400 text-lg sm:text-xl mb-4">Failed to load dimensions 𓇢𓆸</p>
                     <button
                         onClick={() => window.location.reload()}
-                        className="px-6 py-2 bg-neon-green text-black font-bold rounded hover:bg-neon-purple transition"
+                        className="px-4 sm:px-6 py-2 text-sm sm:text-base bg-neon-green text-black font-bold rounded hover:bg-neon-purple transition"
                     >
                         Retry
                     </button>
@@ -174,11 +174,10 @@ function DimensionSearch() {
     };
 
     return (
-        <div className="min-h-screen bg-black text-white p-6">
+        <div className="min-h-screen bg-black text-white px-4 sm:px-6 py-6 sm:py-10">
             {/* Header */}
-            <div className="max-w-7xl mx-auto mb-8">
-                <h1 className="text-7xl
-                                md:text-4xl
+            <div className="max-w-7xl mx-auto mb-6 sm:mb-8">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl
                                 font-serif
                                 font-black
                                 uppercase
@@ -187,150 +186,35 @@ function DimensionSearch() {
                                 text-center">
                     Discover by Vibe
                 </h1>
-                <p className="text-pink-200 text-center text-md">
+                <p className="text-pink-200 text-center text-sm sm:text-base">
                     adjust the sliders to find content that matches your mood
                 </p>
             </div>
 
-            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Left Panel: Dimension Sliders */}
-                <div className="lg:col-span-2">
-                    {error && (
-                        <div className="p-4 bg-red-900/20 border border-red-500 rounded-lg mb-6">
-                            <p className="text-red-400">{error}</p>
-                        </div>
-                    )}
-
-                    {loading && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {[...Array(6)].map((_, i) => (
-                                <ResultSkeleton key={i} />
-                            ))}
-                        </div>
-                    )}
-
-                    {!loading && searched && results.length === 0 && (
-                        <div className="text-center py-12">
-                            <p className="text-xl text-gray-400 mb-4">No matches found</p>
-                            <p className="text-sm text-gray-500">
-                                Try adjusting your dimension sliders or selecting different media types
-                            </p>
-                        </div>
-                    )}
-
-                    {!loading && results.length > 0 && (
-                        <>
-                            <div className="mb-6">
-                                <h2 className="text-lg text-center text-chrome mb-2">
-                                    {results.length} matches found
-                                </h2>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {results.map((result, index) => {
-                                    const content = result.content;
-
-                                    // Format the content for ResultCard
-                                    const formattedItem = {
-                                        externalId: content._id,
-                                        title: content.title,
-                                        subtitle: content.creators?.[0]?.name || content.metadata?.artist || content.releaseDate?.split('-')[0],
-                                        thumbnail: content.images?.poster || content.images?.cover || content.images?.backdrop
-                                    };
-
-                                    return (
-                                        <div key={index} className="relative">
-                                            {/* Display card with poster */}
-                                            <div className="bg-black/40 backdrop-blur-md border border-neon-green rounded-lg overflow-hidden hover:border-green-400 hover:shadow-[0_0_20px_rgba(34,197,94,0.5)] transition-all duration-300">
-
-                                                {/* Thumbnail */}
-                                                <div className="w-full aspect-square bg-black/60 overflow-hidden">
-                                                    {formattedItem.thumbnail ? (
-                                                        <img
-                                                            src={formattedItem.thumbnail}
-                                                            alt={formattedItem.title}
-                                                            className="w-full h-full object-cover hover:scale-110 transition-all duration-500"
-                                                        />
-                                                    ) : (
-                                                        <div className="w-full h-full flex items-center justify-center text-sm opacity-50">
-                                                            No Image
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                {/* Content Info */}
-                                                <div className="p-4">
-                                                    <h3 className="text-xl font-bold bg-green-400 bg-clip-text text-transparent">
-                                                        {formattedItem.title}
-                                                    </h3>
-                                                    {formattedItem.subtitle && (
-                                                        <p className="text-sm text-green-300/70 mt-1">
-                                                            {formattedItem.subtitle}
-                                                        </p>
-                                                    )}
-                                                    <p className="text-xs text-gray-400 mt-2 capitalize">
-                                                        {content.type}
-                                                    </p>
-                                                </div>
-
-                                                {/* Add to Library Button */}
-                                                <button
-                                                    onClick={() => handleOpenModal(content)}
-                                                    className="mt-auto py-2 w-full rounded-md uppercase tracking-wider font-bold text-black bg-gradient-to-r from-green-400 to-green-600 shadow-[0_0_15px_rgba(34,197,94,0.6)] hover:shadow-[0_0_25px_rgba(34,197,94,0.9)] transition-all duration-300"
-                                                >
-                                                    + Add to Library
-                                                </button>
-
-
-                                                {/* Match Badge */}
-                                                <div className={`absolute top-2 right-2 z-10
-                                                                px-3 py-1 rounded-full
-                                                                text-black text-xs font-bold
-                                                                ${getScoreColor(result.matchPercentage)}`}>
-                                                    {result.matchPercentage}% match
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>  
-
-
-                        </>
-                    )}
-
-                    {!loading && !searched && (
-                        <div className="text-center italic py-20">
-
-                            <p className="text-md text-chrome-silver">
-                                select dimensions that match your current mood or preferences ✧˚ ༘ ⋆｡˚
-                            </p>
-                        </div>
-                    )}
-                </div>
-
-                {/* Right Panel: Results */}
-                <div className="lg:col-span-1 space-y-6">
+            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+                {/* Right Panel: Controls (shown first on mobile) */}
+                <div className="lg:col-span-1 lg:order-2 space-y-4 sm:space-y-6">
                     {/* Action Buttons */}
-                    <div className="flex gap-4">
+                    <div className="flex gap-3 sm:gap-4">
                         <button
                             onClick={handleSearch}
                             disabled={loading}
-                            className="flex-1 px-6 py-3 font-serif italic border border-neon-green bg-black text-neon-green font-bold rounded-lg hover:bg-neon-green hover:text-black transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-serif italic border border-neon-green bg-black text-neon-green font-bold rounded-lg hover:bg-neon-green hover:text-black transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? 'Searching...' : 'Search'}
                         </button>
                         <button
                             onClick={handleReset}
-                            className="px-6 py-3 border font-serif italic border-neon-green text-neon-green font-bold rounded-lg hover:bg-neon-green hover:text-black transition"
+                            className="px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base border font-serif italic border-neon-green text-neon-green font-bold rounded-lg hover:bg-neon-green hover:text-black transition"
                         >
                             Reset
                         </button>
                     </div>
+
                     {/* Media Type Filters */}
-                    <div className="p-6 bg-black/40 border border-pink-300 rounded-lg">
-                        <h3 className="text-lg font-bold italic text-center text-neon-green mb-4">Media Types</h3>
-                        <div className="space-y-3">
+                    <div className="p-4 sm:p-6 bg-black/40 border border-pink-300 rounded-lg">
+                        <h3 className="text-base sm:text-lg font-bold italic text-center text-neon-green mb-3 sm:mb-4">Media Types</h3>
+                        <div className="space-y-2.5 sm:space-y-3">
                             {['movie', 'song', 'book'].map(type => (
                                 <label key={type} className="flex items-center gap-3 cursor-pointer">
                                     <input
@@ -339,7 +223,7 @@ function DimensionSearch() {
                                         onChange={() => handleMediaType(type)}
                                         className="w-5 h-5 accent-neon-green"
                                     />
-                                    <span className="text-chrome-silver italic font-mono capitalize">{type}s</span>
+                                    <span className="text-sm sm:text-base text-chrome-silver italic font-mono capitalize">{type}s</span>
                                 </label>
                             ))}
                         </div>
@@ -359,9 +243,9 @@ function DimensionSearch() {
                                     onClick={() =>
                                         setOpenCategory(isOpen ? null : category)
                                     }
-                                    className="w-full px-6 py-4 flex justify-between items-center text-left hover:bg-black/60 transition"
+                                    className="w-full px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center text-left hover:bg-black/60 transition"
                                 >
-                                    <h3 className="text-lg font-bold italic text-neon-green capitalize">
+                                    <h3 className="text-base sm:text-lg font-bold italic text-neon-green capitalize">
                                         {category}
                                     </h3>
                                     <span className="text-neon-green text-xl">
@@ -371,14 +255,14 @@ function DimensionSearch() {
 
                                 {/* Collapsible Content */}
                                 {isOpen && (
-                                    <div className="px-6 pb-6 space-y-4">
+                                    <div className="px-4 sm:px-6 pb-4 sm:pb-6 space-y-3 sm:space-y-4">
                                         {dims.map(dim => (
                                             <div key={dim.key}>
                                                 <div className="flex justify-between mb-2">
-                                                    <label className="text-sm italic font-mono text-chrome-silver">
+                                                    <label className="text-xs sm:text-sm italic font-mono text-chrome-silver">
                                                         {dim.label}
                                                     </label>
-                                                    <span className="text-sm text-neon-green font-mono">
+                                                    <span className="text-xs sm:text-sm text-neon-green font-mono">
                                                         {Math.round((dimensions[dim.key] || 0) * 100)}%
                                                     </span>
                                                 </div>
@@ -400,11 +284,122 @@ function DimensionSearch() {
                             </div>
                         );
                     })}
-
-
                 </div>
 
+                {/* Left Panel: Results (shown second on mobile) */}
+                <div className="lg:col-span-2 lg:order-1">
+                    {error && (
+                        <div className="p-3 sm:p-4 bg-red-900/20 border border-red-500 rounded-lg mb-4 sm:mb-6">
+                            <p className="text-sm sm:text-base text-red-400">{error}</p>
+                        </div>
+                    )}
 
+                    {loading && (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-6">
+                            {[...Array(8)].map((_, i) => (
+                                <ResultSkeleton key={i} />
+                            ))}
+                        </div>
+                    )}
+
+                    {!loading && searched && results.length === 0 && (
+                        <div className="text-center py-12 sm:py-20">
+                            <div className="text-4xl sm:text-6xl mb-4">🔍</div>
+                            <p className="text-lg sm:text-xl text-gray-400 mb-2 sm:mb-4">No matches found</p>
+                            <p className="text-xs sm:text-sm text-gray-500 px-4">
+                                Try adjusting your dimension sliders or selecting different media types
+                            </p>
+                        </div>
+                    )}
+
+                    {!loading && results.length > 0 && (
+                        <>
+                            <div className="mb-4 sm:mb-6">
+                                <h2 className="text-base sm:text-lg text-center text-chrome mb-2">
+                                    {results.length} matches found
+                                </h2>
+                            </div>
+
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-6">
+                                {results.map((result, index) => {
+                                    const content = result.content;
+
+                                    // Format the content for ResultCard
+                                    const formattedItem = {
+                                        externalId: content._id,
+                                        title: content.title,
+                                        subtitle: content.creators?.[0]?.name || content.metadata?.artist || content.releaseDate?.split('-')[0],
+                                        thumbnail: content.images?.poster || content.images?.cover || content.images?.backdrop
+                                    };
+
+                                    return (
+                                        <div key={index} className="relative group">
+                                            {/* Display card with poster */}
+                                            <div className="bg-black/40 backdrop-blur-md border border-neon-green rounded-lg overflow-hidden hover:border-green-400 hover:shadow-[0_0_20px_rgba(34,197,94,0.5)] transition-all duration-300">
+
+                                                {/* Thumbnail */}
+                                                <div className="w-full aspect-[2/3] bg-black/60 overflow-hidden relative">
+                                                    {formattedItem.thumbnail ? (
+                                                        <img
+                                                            src={formattedItem.thumbnail}
+                                                            alt={formattedItem.title}
+                                                            loading="lazy"
+                                                            className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-xs sm:text-sm opacity-50">
+                                                            No Image
+                                                        </div>
+                                                    )}
+                                                    
+                                                    {/* Match Badge */}
+                                                    <div className={`absolute top-2 right-2 z-10
+                                                                    px-2 sm:px-3 py-1 rounded-full
+                                                                    text-black text-xs font-bold
+                                                                    ${getScoreColor(result.matchPercentage)}`}>
+                                                        {result.matchPercentage}%
+                                                    </div>
+                                                </div>
+
+                                                {/* Content Info */}
+                                                <div className="p-2 sm:p-4">
+                                                    <h3 className="text-sm sm:text-base lg:text-lg font-bold bg-green-400 bg-clip-text text-transparent line-clamp-2">
+                                                        {formattedItem.title}
+                                                    </h3>
+                                                    {formattedItem.subtitle && (
+                                                        <p className="text-xs sm:text-sm text-green-300/70 mt-1 line-clamp-1">
+                                                            {formattedItem.subtitle}
+                                                        </p>
+                                                    )}
+                                                    <p className="text-xs text-gray-400 mt-1 sm:mt-2 capitalize">
+                                                        {content.type}
+                                                    </p>
+                                                    
+                                                    {/* Add to Library Button */}
+                                                    <button
+                                                        onClick={() => handleOpenModal(content)}
+                                                        className="mt-2 sm:mt-3 py-1.5 sm:py-2 w-full rounded-md text-xs sm:text-sm uppercase tracking-wider font-bold text-black bg-gradient-to-r from-green-400 to-green-600 shadow-[0_0_15px_rgba(34,197,94,0.6)] hover:shadow-[0_0_25px_rgba(34,197,94,0.9)] transition-all duration-300"
+                                                    >
+                                                        + Add
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </>
+                    )}
+
+                    {!loading && !searched && (
+                        <div className="text-center italic py-12 sm:py-20">
+                            <div className="text-4xl sm:text-6xl mb-4">✧˚ ༘ ⋆｡˚</div>
+                            <p className="text-sm sm:text-base text-chrome-silver px-4">
+                                select dimensions that match your current mood or preferences
+                            </p>
+                        </div>
+                    )}
+                </div>
             </div>
             {/* Rating Modal */}
             <ContentModal

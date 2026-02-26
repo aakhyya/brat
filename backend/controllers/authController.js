@@ -304,4 +304,33 @@ async function getTasteGraphData(req, res) {
   }
 }
 
-module.exports = { signup, login, getMe, getTasteProfile, getTasteGraphData };
+// DELETE /api/auth/account
+async function deleteAccount(req, res) {
+  try {
+    const userId = req.user._id;
+
+    // Delete user and all associated data
+    const Interaction = require('../models/interaction');
+    
+    // Delete all user interactions
+    await Interaction.deleteMany({ userId });
+    
+    // Delete user account
+    await User.findByIdAndDelete(userId);
+
+    res.status(200).json({
+      success: true,
+      message: 'Account deleted successfully'
+    });
+
+  } catch (error) {
+    console.error('Delete account error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete account',
+      error: error.message
+    });
+  }
+}
+
+module.exports = { signup, login, getMe, getTasteProfile, getTasteGraphData, deleteAccount };

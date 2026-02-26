@@ -2,7 +2,7 @@ const express=require("express");
 const router=express.Router();
 const { authLimiter } = require('../middlewares/rateLimiter');
 
-const { signup, login, getMe, getTasteProfile, getTasteGraphData} = require('../controllers/authController');
+const { signup, login, getMe, getTasteProfile, getTasteGraphData, deleteAccount} = require('../controllers/authController');
 const { protect } = require('../middlewares/auth');
 
 // Public routes
@@ -13,5 +13,6 @@ router.post('/login',authLimiter, login);
 router.get('/me', protect, getMe);
 router.get('/taste-profile', protect, getTasteProfile);
 router.get('/taste-graph', protect, getTasteGraphData);
+router.delete('/account', protect, deleteAccount);
 
 module.exports=router;

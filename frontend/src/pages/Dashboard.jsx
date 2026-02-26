@@ -13,7 +13,8 @@ function Dashboard() {
         <div
             className="
         min-h-screen
-        p-8
+        px-4 sm:px-6 lg:px-8
+        py-6 sm:py-8 lg:py-10
         relative
         overflow-hidden
       "
@@ -24,14 +25,13 @@ function Dashboard() {
                 {/* Header */}
                 <h1
                     className="
-                                text-7xl
-                                md:text-6xl
+                                text-5xl sm:text-6xl md:text-7xl lg:text-8xl
                                 font-serif
                                 font-black
                                 uppercase
                                 tracking-tighter
                                 text-chrome
-                                mb-4
+                                mb-4 sm:mb-6
                                 text-center
                             "
                 >
@@ -41,22 +41,22 @@ function Dashboard() {
                 <div
                     className="
             glossy-black
-            p-8
+            p-4 sm:p-6 lg:p-8
             rounded-2xl
             shadow-2xl
-            mb-8
+            mb-6 sm:mb-8
           "
                 >
                     {/* User Info Header */}
-                    <div className="flex items-center justify-between mb-6">
-                        {/* Avatar */}
-                        <div className="flex justify-between">
+                    <div className="flex flex-col lg:flex-row items-center justify-between gap-4 sm:gap-6 mb-6">
+                        {/* Avatar & User Info */}
+                        <div className="flex items-center gap-3 sm:gap-5 w-full lg:w-auto">
                             <div
   className="
-    w-20
-    h-20
+    w-16 h-16 sm:w-20 sm:h-20
     rounded-full
     overflow-hidden
+    flex-shrink-0
   "
 >
   <img
@@ -66,40 +66,31 @@ function Dashboard() {
   />
 </div>
 
-                            <div className="pl-5">
+                            <div className="flex-1 min-w-0">
                                 <h2
                                     className="
-                  text-3xl
+                  text-xl sm:text-2xl lg:text-3xl
                   font-black
                   text-neon-green
-                  mb-2
-                  
+                  mb-1 sm:mb-2
+                  truncate
                 "
                                 >
                                     Welcome {user?.profile?.displayName}ᝰ🚬
                                 </h2>
-                                <p className="text-chrome-silver text-lg">
+                                <p className="text-chrome-silver text-sm sm:text-base lg:text-lg">
                                     prove you're not tasteless
                                 </p>
                             </div>
                         </div>
 
                         {/* Primary Action: Search Content */}
-                        <div className="mb-8 flex flex-col justify-center">
-                            <Link to="/home">
+                        <div className="w-full lg:w-auto flex justify-center lg:justify-end">
+                            <Link to="/home" className="w-full sm:w-auto">
                             <Button variant="secondary">
                                 enter brat
                             </Button>
                             </Link>
-                            {/* <Link to="/search"
-                                className="text-neon-green hover:text-neon-purple">
-                                    ✰ Search Content
-                            </Link>
-
-                            <Link to="/library"
-                                className="text-neon-green hover:text-neon-purple">
-                                ✰ My Library
-                            </Link> */}
                         </div>
                     </div>
 
@@ -108,24 +99,24 @@ function Dashboard() {
                         className="
               grid
               grid-cols-1
-              md:grid-cols-2
-              gap-4
-              mb-6
+              sm:grid-cols-2
+              gap-3 sm:gap-4
+              mb-4 sm:mb-6
             "
                     >
                         <div
                             className="
                 bg-glossy-black/50
-                p-4
+                p-3 sm:p-4
                 rounded-lg
                 border-2
                 border-neon-green/30
               "
                         >
-                            <p className="text-dark-chrome text-sm uppercase tracking-wide">
+                            <p className="text-dark-chrome text-xs sm:text-sm uppercase tracking-wide mb-1">
                                 Email
                             </p>
-                            <p className="text-chrome-silver font-bold">
+                            <p className="text-chrome-silver font-bold text-sm sm:text-base truncate">
                                 {user?.email}
                             </p>
                         </div>
@@ -133,16 +124,16 @@ function Dashboard() {
                         <div
                             className="
                 bg-glossy-black/50
-                p-4
+                p-3 sm:p-4
                 rounded-lg
                 border-2
                 border-neon-green/30
               "
                         >
-                            <p className="text-dark-chrome text-sm uppercase tracking-wide">
+                            <p className="text-dark-chrome text-xs sm:text-sm uppercase tracking-wide mb-1">
                                 Member Since
                             </p>
-                            <p className="text-chrome-silver font-bold">
+                            <p className="text-chrome-silver font-bold text-sm sm:text-base">
                                 {memberSince}
                             </p>
                         </div>
@@ -161,7 +152,7 @@ function Dashboard() {
                 <div
                     className="
             glossy-black
-            p-6
+            p-4 sm:p-6
             rounded-xl
             border-2
             border-electric-cyan/30
@@ -172,7 +163,7 @@ function Dashboard() {
                         className="
               text-chrome-silver
               font-bold
-              text-xl
+              text-base sm:text-lg lg:text-xl
               font-serif
               tracking-wide
             "
