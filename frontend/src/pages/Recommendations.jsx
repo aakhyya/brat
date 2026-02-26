@@ -37,11 +37,14 @@ function Recommendations() {
                 className="
           text-7xl md:text-4xl
           font-serif font-black uppercase
-          text-chrome mb-10 text-center
+          text-chrome mb-8 text-center
         "
             >
                 Your Recommendations
             </h1>
+            <p className="text-center text-neon-green italic mb-6">
+                {recommendations.length} <span className="text-chrome-silver">results found</span>
+            </p>
 
             {loading && (
                 <p className="text-center text-neon-green">Loading your taste profile...</p>

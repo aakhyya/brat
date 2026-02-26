@@ -165,6 +165,14 @@ function DimensionSearch() {
         }
     };
 
+    const getScoreColor = (score) => {
+        if (score >= 85)
+            return "bg-green-300";
+        if (score >= 50)
+            return "bg-yellow-200";
+        return "bg-red-300";
+    };
+
     return (
         <div className="min-h-screen bg-black text-white p-6">
             {/* Header */}
@@ -213,8 +221,8 @@ function DimensionSearch() {
                     {!loading && results.length > 0 && (
                         <>
                             <div className="mb-6">
-                                <h2 className="text-2xl italic font-bold text-chrome mb-2">
-                                    found {results.length} matches
+                                <h2 className="text-lg text-center text-chrome mb-2">
+                                    {results.length} matches found
                                 </h2>
                             </div>
 
@@ -275,24 +283,27 @@ function DimensionSearch() {
 
 
                                                 {/* Match Badge */}
-                                                <div className="absolute top-4 right-4 bg-neon-green text-black px-3 py-1 rounded-full font-bold text-sm shadow-lg">
+                                                <div className={`absolute top-2 right-2 z-10
+                                                                px-3 py-1 rounded-full
+                                                                text-black text-xs font-bold
+                                                                ${getScoreColor(result.matchPercentage)}`}>
                                                     {result.matchPercentage}% match
                                                 </div>
                                             </div>
                                         </div>
                                     );
                                 })}
-                            </div>
+                            </div>  
 
 
                         </>
                     )}
 
                     {!loading && !searched && (
-                        <div className="text-center italic py-16">
+                        <div className="text-center italic py-20">
 
-                            <p className="text-md text-gray-500">
-                                select dimensions that match your current mood or preferences
+                            <p className="text-md text-chrome-silver">
+                                select dimensions that match your current mood or preferences ✧˚ ༘ ⋆｡˚
                             </p>
                         </div>
                     )}

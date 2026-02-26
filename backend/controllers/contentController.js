@@ -688,7 +688,7 @@ async function getDimensions(req, res) {
 //TMDB: Movies
 async function searchMovies(req, res) {
     try {
-        const { q } = req.query;
+        const { q, page = 1 } = req.query;
         if (!q || q.trim().length < 2) {
             return res.status(400).json({
                 success: false,
@@ -696,7 +696,7 @@ async function searchMovies(req, res) {
             });
         }
 
-        const results = await tmdbService.searchMovies(q);
+        const results = await tmdbService.searchMovies(q,page);
         return res.json({
             success: true,
             data: {
@@ -758,7 +758,7 @@ async function enrichMovie(req, res) {
 //iTunes: Songs
 async function searchSongs(req, res) {
     try {
-        const { q } = req.query;
+        const { q,page = 1 } = req.query;
 
         if (!q || q.trim().length < 2) {
             return res.status(400).json({
@@ -767,7 +767,7 @@ async function searchSongs(req, res) {
             });
         }
 
-        const results = await itunesService.searchSongs(q);
+        const results = await itunesService.searchSongs(q,page);
 
         return res.json({
             success: true,
@@ -827,7 +827,7 @@ async function enrichSong(req, res) {
 //GoogleBooks: Books
 async function searchBooks(req, res) {
     try {
-        const { q } = req.query;
+        const { q, page = 1 } = req.query;
 
         if (!q || q.trim().length < 2) {
             return res.status(400).json({
@@ -836,7 +836,7 @@ async function searchBooks(req, res) {
             });
         }
 
-        const results = await googleBooksService.searchBooks(q);
+        const results = await googleBooksService.searchBooks(q, page);
 
         return res.json({
             success: true,

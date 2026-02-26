@@ -13,10 +13,15 @@ function ContentSearch() {
     const [error, setError] = useState(null);
     const [ratingModal, setRatingModal] = useState(null);
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalResults, setTotalResults] = useState(0);
+    const ITEMS_PER_PAGE = 10; // External APIs typically return 20 items
+
+
     const debounceRef = useRef(null); //updating Refs does NOT cause re-renders, hence
     const lastSearchRef = useRef(""); //perfect for timers and mutable values
 
-    async function handleSearch() {
+    async function handleSearch(skipDuplicateCheck=false) {
         const query = searchQuery.trim();
         if (query.length < 2) {
             setResults([]);
@@ -24,7 +29,7 @@ function ContentSearch() {
             return;
         }
 
-        if (query === lastSearchRef.current) return; //prevent duplicate query
+        if (!skipDuplicateCheck && query === lastSearchRef.current) return; //prevent duplicate query
         lastSearchRef.current = query;
 
         setLoading(true);
@@ -35,16 +40,17 @@ function ContentSearch() {
             let data = [];
 
             if (activeTab === "movie") {
-                data = await contentApi.searchMovies(query);
+                data = await contentApi.searchMovies(query,currentPage);
             }
             else if (activeTab === "song") {
-                data = await contentApi.searchSongs(query);
+                data = await contentApi.searchSongs(query,currentPage);
             }
             else if (activeTab === "book") {
-                data = await contentApi.searchBooks(query);
+                data = await contentApi.searchBooks(query,currentPage);
             }
 
             setResults(data);
+            setTotalResults(data.length || 0);
         }
         catch (err) {
             setError(err.message || "Search failed");
@@ -73,11 +79,11 @@ function ContentSearch() {
             try {
                 let data = [];
                 if (activeTab === "movie") {
-                    data = await contentApi.searchMovies(query);
+                    data = await contentApi.searchMovies(query,currentPage);
                 } else if (activeTab === "song") {
-                    data = await contentApi.searchSongs(query);
+                    data = await contentApi.searchSongs(query,currentPage);
                 } else if (activeTab === "book") {
-                    data = await contentApi.searchBooks(query);
+                    data = await contentApi.searchBooks(query,currentPage);
                 }
                 setResults(data);
             } catch (err) {
@@ -89,6 +95,15 @@ function ContentSearch() {
 
         return () => clearTimeout(debounceRef.current);//reset timer while unmounting 
     }, [searchQuery, activeTab]); //reset while new query or switching tabs
+
+    // Separate effect for pagination
+useEffect(() => {
+    if (searchQuery.trim().length >= 2 && currentPage > 1) {
+        handleSearch(true); // Skip duplicate check for pagination
+    }
+}, [currentPage]);
+
+
 
 
 
@@ -102,6 +117,8 @@ function ContentSearch() {
         setResults([]);
         setError(null);
         lastSearchRef.current = ""; //clears last searched values
+        setCurrentPage(1);
+
     }
 
     return (
@@ -188,6 +205,15 @@ function ContentSearch() {
                 </button>
             </div>
 
+            {!loading && totalResults > 0 && (
+    <p className="text-center text-chrome-silver italic text-md mb-6">
+        <span className="text-neon-green text-xl">
+            {totalResults}
+        </span>
+        {" "}results on this page
+    </p>
+)}
+
             {/* Results */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                 {/* Loading */}
@@ -239,6 +265,37 @@ function ContentSearch() {
                     </div>
                 </div>
             )}
+            {/* Pagination Controls */}
+{!loading && !error && results.length > 0 && (
+    <div className="flex justify-center items-center gap-4 mt-8">
+        <button
+    onClick={() => {
+        setCurrentPage(prev => Math.max(1, prev - 1));
+        // Remove handleSearch() from here
+    }}
+    disabled={currentPage === 1}
+    className={`...`}
+>
+    ◀
+</button>
+
+<span className="text-chrome-silver">
+    Page {currentPage}
+</span>
+
+<button
+    onClick={() => {
+        setCurrentPage(prev => prev + 1);
+        // Remove handleSearch() from here
+    }}
+    disabled={results.length < ITEMS_PER_PAGE}
+    className={`...`}
+>
+    ▶
+</button>
+
+    </div>
+)}
 
 
         </div>

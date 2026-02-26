@@ -37,11 +37,11 @@ function validateQuery(query) { //Validating query
 export const contentApi = { //One single object, no duplication of fetch
     // UI components -> dumb; Services -> smart, defensive
     //Search
-    searchMovies: async (query) => {
+    searchMovies: async (query,page = 1) => {
         if (!validateQuery(query)) return [];
         try {
             const res = await api.get(`/api/content/enrich/movie/search`,
-                { params: { q: query } }
+                { params: { q: query, page: page  } }
             );
 
             return res.data?.data?.results || [];
@@ -51,11 +51,11 @@ export const contentApi = { //One single object, no duplication of fetch
             return [];
         }
     },
-    searchSongs: async (query) => {
+    searchSongs: async (query,page = 1) => {
         if (!validateQuery(query)) return [];
         try {
             const res = await api.get(`/api/content/enrich/song/search`,
-                { params: { q: query } }
+                { params: { q: query, page: page  } }
             );
 
             return res.data?.data?.results || [];
@@ -65,11 +65,11 @@ export const contentApi = { //One single object, no duplication of fetch
             return [];
         }
     },
-    searchBooks: async (query) => {
+    searchBooks: async (query,page = 1) => {
         if (!validateQuery(query)) return [];
         try {
             const res = await api.get(`/api/content/enrich/book/search`,
-                { params: { q: query } }
+                { params: { q: query, page: page  } }
             );
 
             return res.data?.data?.results || [];
@@ -124,7 +124,7 @@ export const contentApi = { //One single object, no duplication of fetch
             params.page = page;
 
             const res = await api.get("/api/content/library", { params });
-            return res.data?.data || [];
+            return res.data || { data: [] };
         }
         catch (err) {
             handleApiError(err, "Failed to fetch library");

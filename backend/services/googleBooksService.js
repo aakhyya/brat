@@ -7,7 +7,7 @@ class GoogleBooksService{
 
         this.client=axios.create({
             baseURL:this.baseURL,
-            timeout:10000,
+            timeout:20000,
         });
     }
 

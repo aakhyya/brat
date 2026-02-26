@@ -5,7 +5,7 @@ class iTunesService {
       this.baseURL = 'https://itunes.apple.com';
       this.client = axios.create({
         baseURL: this.baseURL,
-        timeout: 10000 //how long Axios will wait for a response before it gives up and throws an error.
+        timeout: 20000 //how long Axios will wait for a response before it gives up and throws an error.
       });
     }
 

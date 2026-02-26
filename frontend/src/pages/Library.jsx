@@ -12,6 +12,8 @@ function Library() {
     const [selectedItem, setSelectedItem] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedForCrossMedia, setSelectedForCrossMedia] = useState(null);
+    const [totalItems, setTotalItems] = useState(0);
+
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -23,7 +25,9 @@ function Library() {
 
             try {
                 const res = await contentApi.getUserLibrary(filter, sortBy, page);
-                setLibrary(res);
+                setLibrary(res.data || []); // Extract the data array
+                setTotalItems(res.totalItems || 0);
+
             } catch (err) {
                 setError(err);
             } finally {
@@ -84,7 +88,7 @@ function Library() {
                     })}
                 </div>
 
-                <div className="flex justify-center mb-8">
+                <div className="flex justify-center mb-4">
                     <select
                         value={sortBy}
                         onChange={(e) => {
@@ -93,18 +97,30 @@ function Library() {
                         }}
                         className="
     bg-black/70
-    border border-neon-green/50
+    border border-pink-500
     px-4 py-2 rounded-md
-    text-neon-green
+    text-pink-200
     font-semibold
     focus:outline-none
-    focus:border-neon-green
+    focus:border-pink-200
     focus:shadow-[0_0_15px_rgba(34,197,94,0.6)]">
                         <option value="newest">latest</option>
                         <option value="rating">highest rated</option>
                         <option value="title">a-z</option>
                     </select>
+
+
                 </div>
+                {/* Total Items Count */}
+                {!loading && totalItems > 0 && (
+                    <p className="text-center text-chrome-silver italic text-md mb-6">
+                        <span className="text-neon-green text-xl">
+                            {totalItems}
+                        </span>
+                        {" "}items found
+                    </p>
+                )}
+
 
                 {/* Loading Skeleton */}
                 {loading && (
@@ -149,31 +165,31 @@ function Library() {
                             >
                                 <div className="flex justify-between">
                                     <div>
-                                    <h3 className="text-lg font-bold  text-neon-green">
-                                        {item.isFavorite && (
-                                            <span className="text-pink-400 mr-2">
-                                                ★
-                                            </span>
-                                        )}
-                                        {item.content.title}
-                                    </h3>
+                                        <h3 className="text-lg font-bold  text-neon-green">
+                                            {item.isFavorite && (
+                                                <span className="text-pink-400 mr-2">
+                                                    ★
+                                                </span>
+                                            )}
+                                            {item.content.title}
+                                        </h3>
                                     </div>
                                     <div>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation(); // prevent modal from opening
-                                            setSelectedForCrossMedia(item.content);
-                                        }}
-                                        className="
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // prevent modal from opening
+                                                setSelectedForCrossMedia(item.content);
+                                            }}
+                                            className="
                                             px-3 py-2 rounded-md
                                             text-sm font-bold border border-pink-300
                                             text-chrome-silver
                                             hover:shadow-[0_0_20px_rgba(168,85,247,0.6)]
                                             transition-all duration-300
                                         "
-                                    >
-                                        🔗 similar content
-                                    </button>
+                                        >
+                                            🔗 similar content
+                                        </button>
                                     </div>
                                 </div>
                                 <p className="text-gray-200 mb-1 text-md">
@@ -297,7 +313,7 @@ function Library() {
                         </h2>
 
                         <p className="text-gray-400 mb-6">
-                            
+
                         </p>
 
                         {/* Cross-media section */}
