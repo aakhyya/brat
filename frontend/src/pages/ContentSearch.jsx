@@ -100,8 +100,13 @@ function ContentSearch() {
         setActiveTab(tab);
         setResults([]);
         setError(null);
-        lastSearchRef.current = "";
         setCurrentPage(1);
+        
+        // Trigger search immediately if there's a query
+        if (searchQuery.trim().length >= 2) {
+            lastSearchRef.current = ""; // Clear to allow new search
+            setTimeout(() => handleSearch(true), 0);
+        }
     }
 
     return (
