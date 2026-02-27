@@ -3,12 +3,14 @@ const axios=require("axios");
 class TMDBService{
     constructor(){
         this.apiKey=process.env.TMDB_API_KEY
-        this.baseURL=process.env.TMDB_BASE_URL
+        this.baseURL='https://api.themoviedb.org/3'
 
         this.client=axios.create({
             baseURL:this.baseURL,
+            params: {
+                api_key: this.apiKey  // TMDB v3 uses api_key as query param
+            },
             headers:{
-                Authorization: `Bearer ${this.apiKey}`,
                 "Content-Type": "application/json",
             },
             timeout:20000,
