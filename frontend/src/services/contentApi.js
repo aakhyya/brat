@@ -44,9 +44,13 @@ export const contentApi = { //One single object, no duplication of fetch
                 { params: { q: query, page: page  } }
             );
 
-            return res.data?.data?.results || [];
+            console.log('Movies API Response:', res.data);
+            const results = res.data?.data?.results || [];
+            console.log('Movies Results:', results);
+            return results;
         }
         catch (err) {
+            console.error('Movie search error:', err);
             handleApiError(err, "Failed to search movies");
             return [];
         }
@@ -72,9 +76,13 @@ export const contentApi = { //One single object, no duplication of fetch
                 { params: { q: query, page: page  } }
             );
 
-            return res.data?.data?.results || [];
+            console.log('Books API Response:', res.data);
+            const results = res.data?.data?.results || [];
+            console.log('Books Results:', results);
+            return results;
         }
         catch (err) {
+            console.error('Book search error:', err);
             handleApiError(err, "Failed to search books");
             return [];
         }
