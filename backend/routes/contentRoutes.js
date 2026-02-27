@@ -27,10 +27,10 @@ router.post("/", protect, createContent);
 router.put("/:id", protect, updateContent);
 router.delete("/:id", protect, deleteContent);
 
-// Search routes
-router.get('/enrich/movie/search', protect, searchMovies);
-router.get('/enrich/song/search', protect, searchSongs);
-router.get('/enrich/book/search', protect, searchBooks);
+// Search routes (public - no auth required)
+router.get('/enrich/movie/search', searchMovies);
+router.get('/enrich/song/search', searchSongs);
+router.get('/enrich/book/search', searchBooks);
 
 // Enrich & save routes
 router.post('/enrich/movie/:tmdbId', protect, enrichMovie);
