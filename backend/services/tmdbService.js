@@ -23,6 +23,9 @@ class TMDBService{
                 throw new Error('Query too short');
             }
 
+            console.log('TMDB API Key exists:', !!this.apiKey);
+            console.log('TMDB Base URL:', this.baseURL);
+
             const res=await this.client.get("/search/movie",{
                 params:{
                     query:query.trim(),
@@ -41,6 +44,8 @@ class TMDBService{
         catch(err){
             //API down or rate limit
             console.error('TMDB searchMovies error:', err.message);
+            console.error('TMDB error response:', err.response?.data);
+            console.error('TMDB error status:', err.response?.status);
             return [];
         }
     }

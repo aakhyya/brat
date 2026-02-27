@@ -3,7 +3,7 @@ const axios=require("axios");
 class GoogleBooksService{
     constructor(){
         this.apiKey=process.env.GOOGLE_BOOKS_API_KEY;
-        this.baseURL = process.env.GOOGLE_BOOKS_BASE_URL;
+        this.baseURL = 'https://www.googleapis.com/books/v1';
 
         this.client=axios.create({
             baseURL:this.baseURL,
